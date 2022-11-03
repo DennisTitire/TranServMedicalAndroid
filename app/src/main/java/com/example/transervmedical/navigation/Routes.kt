@@ -5,8 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.transervmedical.presentation.screens.add_event.AddEventScreen
 import com.example.transervmedical.presentation.screens.calendar.CalendarScreen
 import com.example.transervmedical.presentation.screens.home.HomeScreen
+import com.example.transervmedical.presentation.screens.log_in.LogInScreen
+import com.example.transervmedical.presentation.screens.sign_in.SignInScreen
 import com.example.transervmedical.presentation.screens.splash.SplashScreen
 
 @ExperimentalFoundationApi
@@ -25,6 +28,15 @@ fun Routes(navHostController: NavHostController) {
         }
         composable(route = Screen.Calendar.route) {
             CalendarScreen()
+        }
+        composable(route = Screen.AddEvent.route) {
+            AddEventScreen(navHostController = navHostController)
+        }
+        composable(route = Screen.LogIn.route) {
+            LogInScreen(navHostController = navHostController)
+        }
+        composable(route = Screen.SignIn.route) {
+            SignInScreen(navHostController = navHostController)
         }
     }
 
