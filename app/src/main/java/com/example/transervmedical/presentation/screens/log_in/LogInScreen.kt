@@ -17,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,8 +26,8 @@ import androidx.navigation.NavHostController
 fun LogInScreen(
     navHostController: NavHostController,
 ) {
-    var emailTextField by remember { mutableStateOf(TextFieldValue("")) }
-    var passwordTextField by remember { mutableStateOf(TextFieldValue("")) }
+    var emailTextField by remember { mutableStateOf(("")) }
+    var passwordTextField by remember { mutableStateOf(("")) }
 
     Column(
         modifier = Modifier
