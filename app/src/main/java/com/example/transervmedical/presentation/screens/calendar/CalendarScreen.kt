@@ -9,9 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,34 +20,58 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.transervmedical.navigation.Screen
+import com.example.transervmedical.ui.theme.Blue
 import java.text.SimpleDateFormat
 import java.util.*
 
 @ExperimentalFoundationApi
 @Composable
-fun CalendarScreen() {
-
+fun CalendarScreen(
+    navHostController: NavHostController
+) {
     val lazyListState = rememberLazyListState()
-
-    LazyColumn(
-        state = lazyListState,
-        contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background)
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(text = "Calendar", fontSize = 32.sp) },
+                backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
+                contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navHostController.navigate(Screen.Dashboard.route)
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back button"
+                        )
+                    }
+                }
+            )
+        }
     ) {
-        calendarListEvents.forEach { event ->
-            item {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = event.day,
-                        style = MaterialTheme.typography.h5,
-                        color = if (isSystemInDarkTheme()) Color.White else Color.Black
-                    )
-                    CalendarEventItem(event = event)
+        LazyColumn(
+            state = lazyListState,
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+        ) {
+            calendarListEvents.forEach { event ->
+                item {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = event.day,
+                            style = MaterialTheme.typography.h5,
+                            color = if (isSystemInDarkTheme()) Color.White else Color.Black
+                        )
+                        CalendarEventItem(event = event)
+                    }
                 }
             }
         }
@@ -74,7 +98,7 @@ fun LazyItemScope.CalendarEventItem(
                     .width(8.dp)
                     .height(34.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFFFF2965))
+                    .background(Blue)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Column(

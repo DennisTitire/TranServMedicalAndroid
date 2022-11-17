@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material.Surface
 import androidx.navigation.compose.rememberNavController
 import com.example.transervmedical.navigation.Routes
 import com.example.transervmedical.ui.theme.TranServMedicalTheme
@@ -16,8 +17,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TranServMedicalTheme {
-                val navHostController = rememberNavController()
-                Routes(navHostController = navHostController)
+                Surface {
+                    val navHostController = rememberNavController()
+                    Routes(navHostController = navHostController)
+                }
             }
         }
     }

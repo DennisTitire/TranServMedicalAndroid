@@ -1,9 +1,9 @@
-package com.example.transervmedical.presentation
+package com.example.transervmedical.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.transervmedical.domain.model.User
-import com.example.transervmedical.domain.use_case.UserUseCases
+import com.example.transervmedical.domain.use_case.user.UserUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package com.example.transervmedical.presentation.screens.home
+package com.example.transervmedical.presentation.screens.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -31,8 +30,8 @@ fun HomeItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClick() }
                 .padding(18.dp)
+                .clickable { onClick() }
         ) {
             Text(
                 text = title,

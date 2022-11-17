@@ -29,5 +29,5 @@ fun SplashScreen(
         )
     }
     navHostController.popBackStack()
-    navHostController.navigate(route = Screen.Home.route)
+    navHostController.navigate(route = Screen.LogIn.route)
 }

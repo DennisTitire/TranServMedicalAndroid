@@ -5,9 +5,15 @@ import androidx.room.Room
 import com.example.transervmedical.data.data_source.UserDatabase
 import com.example.transervmedical.data.repository.UserRepositoryImpl
 import com.example.transervmedical.domain.repository.UserRepository
-import com.example.transervmedical.domain.use_case.AddUser
-import com.example.transervmedical.domain.use_case.GetUser
-import com.example.transervmedical.domain.use_case.UserUseCases
+import com.example.transervmedical.domain.use_case.form.*
+import com.example.transervmedical.domain.use_case.form.register.*
+import com.example.transervmedical.domain.use_case.form.validation.ValidateEmail
+import com.example.transervmedical.domain.use_case.form.validation.ValidatePassword
+import com.example.transervmedical.domain.use_case.form.validation.ValidatePhoneNumber
+import com.example.transervmedical.domain.use_case.form.validation.ValidateRepeatedPassword
+import com.example.transervmedical.domain.use_case.user.AddUser
+import com.example.transervmedical.domain.use_case.user.GetUser
+import com.example.transervmedical.domain.use_case.user.UserUseCases
 import com.example.transervmedical.util.Util.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
@@ -41,6 +47,17 @@ object AppModule {
         return UserUseCases(
             addUserUseCase = AddUser(repository = repository),
             getUserUseCase = GetUser(repository = repository)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideRegistrationUseCases(): RegistrationUseCases {
+        return RegistrationUseCases(
+            validateEmail = ValidateEmail(),
+            validatePhoneNumber = ValidatePhoneNumber(),
+            validatePassword = ValidatePassword(),
+            validateRepeatedPassword = ValidateRepeatedPassword()
         )
     }
 }

@@ -7,28 +7,29 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
+    primary = Blue,
     primaryVariant = Purple700,
     secondary = Teal200,
-    background = Color.Black
+    onPrimary = Color.White
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
+    primary = Blue,
     primaryVariant = Purple700,
     secondary = Teal200,
     background = Color.White
 
     /* Other default colors to override
     background = Color.White,
-    surface = Color.White,
+        surface = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
+        onBackground = Color.Black,
+        onSurface = Color.Black,
     */
 )
 
@@ -52,7 +53,7 @@ fun TranServMedicalTheme(
 
     MaterialTheme(
         colors = colors,
-        typography = Typography,
+        typography = if (darkTheme) Typography.copy(TextStyle(color = Color.White)) else Typography.copy(TextStyle(color = Color.Black)),
         shapes = Shapes,
         content = content
     )

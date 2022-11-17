@@ -1,146 +1,166 @@
 package com.example.transervmedical.presentation.screens.add_event
 
 import android.app.DatePickerDialog
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.transervmedical.R
+import com.example.transervmedical.navigation.Screen
+import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueButton
+import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextEmailOutline
+import com.example.transervmedical.ui.theme.Blue
 
 @Composable
 fun AddEventScreen(
     navHostController: NavHostController
 ) {
     val context = LocalContext.current
-    var titleEvent by remember { mutableStateOf(TextFieldValue("")) }
-    var descriptionEvent by remember { mutableStateOf(TextFieldValue("")) }
-    var allDay by rememberSaveable { mutableStateOf(false) }
+    var titleEvent by remember { mutableStateOf("") }
+    var descriptionEvent by remember { mutableStateOf("") }
+    var allDay by rememberSaveable { mutableStateOf(true) }
+    val focusManager = LocalFocusManager.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background)
-            .padding(start = 12.dp, end = 12.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
-        Text(
-            modifier = Modifier.padding(start = 24.dp),
-            text = "Add Event",
-            style = MaterialTheme.typography.h6.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 32.sp,
-                color = if (isSystemInDarkTheme()) Color.White else Color.Black
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(text = "Calendar Event", fontSize = 32.sp) },
+                backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
+                contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navHostController.navigate(Screen.LogIn.route)
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back button"
+                        )
+                    }
+                }
             )
-        )
-        OutlinedTextField(
-            value = titleEvent,
-            onValueChange = { titleEvent = it },
-            label = { Text(text = "Title") },
-            shape = RoundedCornerShape(15.dp),
-            maxLines = 1,
+        }
+    ) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
-        )
-        Spacer(Modifier.height(8.dp))
-        Column {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 12.dp)
-            ) {
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            EditTextEmailOutline(
+                value = titleEvent,
+                onValueChange = { titleEvent = it },
+                label = "Title",
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                })
+            )
+            Spacer(Modifier.height(8.dp))
+            Column {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 12.dp)
                 ) {
-                    Icon(painter = painterResource(R.drawable.ic_time), null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "All Day",
-                        style = MaterialTheme.typography.body1
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(painter = painterResource(R.drawable.ic_time), null)
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "All Day",
+                            style = MaterialTheme.typography.body1
+                        )
+                    }
+                    Switch(
+                        checked = allDay,
+                        onCheckedChange = { allDay = !allDay },
+                        colors = SwitchDefaults.colors(Blue)
                     )
                 }
-                Switch(
-                    checked = allDay,
-                    onCheckedChange = { allDay = !allDay }
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Start: Thu, Nov 03, 2022",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier
-                        .clickable { DatePickerDialog(context).show() }
-                        .padding(horizontal = 28.dp, vertical = 16.dp)
-                )
-                Text(
-                    text = "2:02 PM",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier
-                        .clickable { "TimePickerDialog(context).show()" }
-                        .padding(horizontal = 18.dp, vertical = 16.dp)
+                AnimatedVisibility(visible = !allDay) {
+                    Column {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Start: Thu, Nov 03, 2022",
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .clickable { DatePickerDialog(context).show() }
+                                    .padding(horizontal = 28.dp, vertical = 16.dp)
+                            )
+                            Text(
+                                text = "2:02 PM",
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .clickable { "TimePickerDialog(context).show()" }
+                                    .padding(horizontal = 18.dp, vertical = 16.dp)
 
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "End: Fri, Nov 03, 2022",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier
-                        .clickable { /* TODO */ }
-                        .padding(horizontal = 28.dp, vertical = 16.dp)
-                )
-                Text(
-                    text = "2:02 PM",
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier
-                        .clickable { /* TODO */ }
-                        .padding(horizontal = 18.dp, vertical = 16.dp)
-                )
-            }
-
-            OutlinedTextField(
-                value = descriptionEvent,
-                onValueChange = { descriptionEvent = it },
-                label = { Text(text = "Description") },
-                shape = RoundedCornerShape(15.dp),
-                modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(painter = painterResource(id = R.drawable.ic_description), null)
+                            )
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "End: Fri, Nov 03, 2022",
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .clickable { DatePickerDialog(context).show() }
+                                    .padding(horizontal = 28.dp, vertical = 16.dp)
+                            )
+                            Text(
+                                text = "2:02 PM",
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier
+                                    .clickable { /* TODO */ }
+                                    .padding(horizontal = 18.dp, vertical = 16.dp)
+                            )
+                        }
+                    }
                 }
-            )
-            OutlinedButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
-            ) {
-                Text(
-                    text = "Save Event",
-                    style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.SemiBold),
-                    textAlign = TextAlign.Center
+                EditTextEmailOutline(
+                    value = descriptionEvent,
+                    onValueChange = { descriptionEvent = it },
+                    label = "Description",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_description),
+                            contentDescription = "description"
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                BlueButton(
+                    onClick = { /* TODO */ },
+                    buttonText = "Save Event"
                 )
             }
         }
