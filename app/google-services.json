@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "309954547314",
+    "project_id": "transervmedical",
+    "storage_bucket": "transervmedical.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309954547314:android:7d52a6fc51c8e6fe423ceb",
+        "android_client_info": {
+          "package_name": "com.example.transervmedical"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "309954547314-k4oqqgpu4ibq4gd3q6faueor1lq9ksvm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.transervmedical",
+            "certificate_hash": "260b16c3952bfe69c7724466336b351ec75abf93"
+          }
+        },
+        {
+          "client_id": "309954547314-sh4et6pqk7g3slil14cl6v9v41j424fu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQehqlti9bPX3a-C2FSNfl75-ITQU0xgM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "309954547314-sh4et6pqk7g3slil14cl6v9v41j424fu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

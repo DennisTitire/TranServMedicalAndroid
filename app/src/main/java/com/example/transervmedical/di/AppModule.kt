@@ -11,10 +11,10 @@ import com.example.transervmedical.domain.use_case.form.validation.ValidateEmail
 import com.example.transervmedical.domain.use_case.form.validation.ValidatePassword
 import com.example.transervmedical.domain.use_case.form.validation.ValidatePhoneNumber
 import com.example.transervmedical.domain.use_case.form.validation.ValidateRepeatedPassword
-import com.example.transervmedical.domain.use_case.user.AddUser
-import com.example.transervmedical.domain.use_case.user.GetUser
-import com.example.transervmedical.domain.use_case.user.UserUseCases
 import com.example.transervmedical.util.Util.DATABASE_NAME
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,14 +41,14 @@ object AppModule {
         return UserRepositoryImpl(database.userDao)
     }
 
-    @Provides
-    @Singleton
-    fun provideUserUseCases(repository: UserRepository): UserUseCases {
-        return UserUseCases(
-            addUserUseCase = AddUser(repository = repository),
-            getUserUseCase = GetUser(repository = repository)
-        )
-    }
+//    @Provides
+//    @Singleton
+//    fun provideUserUseCases(repository: UserRepository): UserUseCases {
+//        return UserUseCases(
+//            addUserUseCase = AddUser(repository = repository),
+//            getUserUseCase = GetUser(repository = repository)
+//        )
+//    }
 
     @Provides
     @Singleton
@@ -59,5 +59,11 @@ object AppModule {
             validatePassword = ValidatePassword(),
             validateRepeatedPassword = ValidateRepeatedPassword()
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebase(): FirebaseAuth {
+        return Firebase.auth
     }
 }

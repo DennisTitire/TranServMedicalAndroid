@@ -49,6 +49,7 @@ object ReusableComponents {
         label: String,
         maxLines: Int = Int.MAX_VALUE,
         leadingIcon: @Composable (() -> Unit)? = null,
+        isError: Boolean = false,
         keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
         keyboardActions: KeyboardActions = KeyboardActions.Default
     ) {
@@ -60,6 +61,7 @@ object ReusableComponents {
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             maxLines = maxLines,
+            isError = isError,
             leadingIcon = leadingIcon,
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,6 +76,7 @@ object ReusableComponents {
         label: String,
         visibility: MutableState<Boolean> = remember { mutableStateOf(false) },
         maxLines : Int = Int.MAX_VALUE,
+        isError: Boolean = false,
         keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
         keyboardActions: KeyboardActions = KeyboardActions.Default
     ) {
@@ -97,6 +100,7 @@ object ReusableComponents {
                     Icon(imageVector = image, contentDescription = imageDescription)
                 }
             },
+            isError = isError,
             maxLines = maxLines,
             modifier = Modifier
                 .fillMaxWidth()

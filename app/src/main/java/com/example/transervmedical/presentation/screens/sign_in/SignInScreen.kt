@@ -23,33 +23,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.transervmedical.domain.model.User
 import com.example.transervmedical.domain.use_case.form.register.RegistrationFormEvent
 import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueButton
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextEmailOutline
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextPasswordOutline
-import com.example.transervmedical.presentation.viewmodel.RegistrationViewModel
+import com.example.transervmedical.presentation.viewmodel.UserViewModel
 
 @Composable
 fun SignInScreen(
     navHostController: NavHostController,
-    registrationViewModel: RegistrationViewModel = hiltViewModel()
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val state = registrationViewModel.state
+    val registerState = userViewModel.registerState
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(key1 = context) {
-        registrationViewModel.validationEvents.collect { event ->
+        userViewModel.validationEvents.collect { event ->
             when (event) {
-                is RegistrationViewModel.ValidationEvent.Success -> {
+                is UserViewModel.ValidationEvent.Success -> {
+                    userViewModel.registerUserToFirebase(
+                        userViewModel.registerState.email,
+                        userViewModel.registerState.password
+                    )
                     Toast.makeText(
                         context,
-                        "Added user with email: ${state.email}",
+                        "Added user with email: ${userViewModel.registerState.email}",
                         Toast.LENGTH_SHORT
                     ).show()
-                    navHostController.navigate(route = Screen.Dashboard.route)
+                    navHostController.navigate(route = Screen.LogIn.route)
                 }
             }
         }
@@ -72,7 +75,7 @@ fun SignInScreen(
                     }
                 }
             )
-        }
+        },
     ) {
         Column(
             modifier = Modifier
@@ -85,76 +88,112 @@ fun SignInScreen(
                 text = "Create account", fontSize = 32.sp
             )
             EditTextEmailOutline(
-                value = state.email,
-                onValueChange = { registrationViewModel.onEvent(RegistrationFormEvent.EmailChanged(it)) },
+                value = registerState.email,
+                onValueChange = {
+                    userViewModel.onEventRegister(
+                        RegistrationFormEvent.EmailChanged(
+                            it
+                        )
+                    )
+                },
                 label = "Email",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                isError = registerState.emailErrorType,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 })
             )
-            if (state.emailError != null) {
+            if (registerState.emailError != null) {
                 Text(
-                    text = state.emailError,
+                    text = registerState.emailError,
+                    style = MaterialTheme.typography.h1,
                     color = MaterialTheme.colors.error
                 )
             }
 
             EditTextEmailOutline(
-                value = state.phoneNumber,
-                onValueChange = { registrationViewModel.onEvent(RegistrationFormEvent.PhoneNumberChanged(it)) },
+                value = registerState.phoneNumber,
+                onValueChange = {
+                    userViewModel.onEventRegister(
+                        RegistrationFormEvent.PhoneNumberChanged(
+                            it
+                        )
+                    )
+                },
                 label = "Phone Number",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next),
+                isError = registerState.phoneNumberErrorType,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
+                ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 })
             )
 
-            if (state.phoneNumberError != null) {
+            if (registerState.phoneNumberError != null) {
                 Text(
-                    text = state.phoneNumberError,
+                    text = registerState.phoneNumberError,
+                    style = MaterialTheme.typography.h1,
                     color = MaterialTheme.colors.error
                 )
             }
             EditTextPasswordOutline(
-                value = state.password,
-                onValueChange = { registrationViewModel.onEvent(RegistrationFormEvent.PasswordChanged(it)) },
+                value = registerState.password,
+                onValueChange = {
+                    userViewModel.onEventRegister(
+                        RegistrationFormEvent.PasswordChanged(
+                            it
+                        )
+                    )
+                },
                 label = "Password",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+                isError = registerState.passwordErrorType,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 })
             )
-            if (state.passwordError != null) {
+            if (registerState.passwordError != null) {
                 Text(
-                    text = state.passwordError,
+                    text = registerState.passwordError,
+                    style = MaterialTheme.typography.h1,
                     color = MaterialTheme.colors.error
                 )
             }
             EditTextPasswordOutline(
-                value = state.repeatedPassword,
-                onValueChange = { registrationViewModel.onEvent(RegistrationFormEvent.RepeatedPasswordChanged(it)) },
+                value = registerState.repeatedPassword,
+                onValueChange = {
+                    userViewModel.onEventRegister(
+                        RegistrationFormEvent.RepeatedPasswordChanged(
+                            it
+                        )
+                    )
+                },
                 label = "Repeated Password",
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+                isError = registerState.repeatedPasswordErrorType,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                )
             )
-            if (state.repeatedPasswordError != null) {
+            if (registerState.repeatedPasswordError != null) {
                 Text(
-                    text = state.repeatedPasswordError,
+                    text = registerState.repeatedPasswordError,
+                    style = MaterialTheme.typography.h1,
                     color = MaterialTheme.colors.error
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
             BlueButton(
                 onClick = {
-                    registrationViewModel.addUserInDb(
-                        User(
-                            email = state.email,
-                            phoneNumber = state.phoneNumber,
-                            password = state.password,
-                            repeatedPassword = state.repeatedPassword
-                        )
-                    )
-                    registrationViewModel.onEvent(RegistrationFormEvent.Submit)
+                    userViewModel.onEventRegister(RegistrationFormEvent.Submit)
                 },
                 buttonText = "Sign up"
             )

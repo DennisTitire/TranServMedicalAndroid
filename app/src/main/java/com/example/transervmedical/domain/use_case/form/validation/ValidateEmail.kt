@@ -8,13 +8,15 @@ class ValidateEmail {
         if (email.isBlank()) {
             return ValidationResult(
                 success = false,
-                errorMessage = "The email can't be blank"
+                errorMessage = "The email can't be blank",
+                errorType = true
             )
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return ValidationResult(
                 success = false,
-                errorMessage = "That's not a valid email"
+                errorMessage = "That's not a valid email",
+                errorType = true
             )
         }
         return ValidationResult(

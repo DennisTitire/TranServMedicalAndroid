@@ -46,7 +46,7 @@ fun AddEventScreen(
                 contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 navigationIcon = {
                     IconButton(onClick = {
-                        navHostController.navigate(Screen.LogIn.route)
+                        navHostController.navigate(Screen.Dashboard.route)
                     }) {
                         Icon(
                             modifier = Modifier.size(32.dp),

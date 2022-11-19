@@ -1,5 +1,6 @@
 package com.example.transervmedical.presentation.screens.log_in
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,23 +24,46 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.transervmedical.R
+import com.example.transervmedical.domain.use_case.form.login.LogInFormEvent
 import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueButton
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextEmailOutline
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextPasswordOutline
+import com.example.transervmedical.presentation.viewmodel.UserViewModel
 import com.example.transervmedical.ui.theme.Blue
 
 @Composable
 fun LogInScreen(
     navHostController: NavHostController,
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
-    var emailTextField by remember { mutableStateOf(("")) }
-    var passwordTextField by remember { mutableStateOf(("")) }
 
+    val loginState = userViewModel.loginState
     val passwordVisible: MutableState<Boolean> = remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(key1 = true) {
+        userViewModel.validationEvents.collect { event ->
+            when (event) {
+                is UserViewModel.ValidationEvent.Success -> {
+                    userViewModel.signInUser(
+                        userViewModel.loginState.email,
+                        userViewModel.loginState.password
+                    )
+                    Toast.makeText(
+                        context,
+                        "Successful log in with\n${userViewModel.loginState.email}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    navHostController.navigate(route = Screen.Dashboard.route)
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -62,25 +87,49 @@ fun LogInScreen(
             )
         )
         EditTextEmailOutline(
-            value = emailTextField,
-            onValueChange = { emailTextField = it },
+            value = loginState.email,
+            onValueChange = { userViewModel.onEventLogin(LogInFormEvent.EmailChanged(it)) },
             label = "Email",
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+            isError = loginState.emailErrorType,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
             keyboardActions = KeyboardActions(onNext = {
                 focusManager.moveFocus(FocusDirection.Down)
             })
         )
+        if (loginState.emailError != null) {
+            Text(
+                text = loginState.emailError,
+                style = MaterialTheme.typography.h1,
+                color = MaterialTheme.colors.error
+            )
+        }
         EditTextPasswordOutline(
-            value = passwordTextField,
-            onValueChange = { passwordTextField = it },
+            value = loginState.password,
+            onValueChange = { userViewModel.onEventLogin(LogInFormEvent.PasswordChanged(it)) },
             label = "Password",
             visibility = passwordVisible,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+            isError = loginState.passwordErrorType,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            )
         )
+        if (loginState.passwordError != null) {
+            Text(
+                text = loginState.passwordError,
+                style = MaterialTheme.typography.h1,
+                color = MaterialTheme.colors.error
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
 
         BlueButton(
-            onClick = { navHostController.navigate(Screen.Dashboard.route) },
+            onClick = {
+                userViewModel.onEventLogin(LogInFormEvent.LoginSubmit)
+            },
             buttonText = "Log in",
         )
         Spacer(modifier = Modifier.height(90.dp))
