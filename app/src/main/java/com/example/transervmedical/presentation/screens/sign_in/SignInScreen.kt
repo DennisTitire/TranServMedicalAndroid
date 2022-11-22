@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.transervmedical.domain.use_case.form.register.RegistrationFormEvent
+import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
 import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueButton
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextEmailOutline
@@ -42,7 +43,7 @@ fun SignInScreen(
     LaunchedEffect(key1 = context) {
         userViewModel.validationEvents.collect { event ->
             when (event) {
-                is UserViewModel.ValidationEvent.Success -> {
+                is ValidationEvent.Success -> {
                     Toast.makeText(
                         context,
                         "Added user with email: ${userViewModel.registerState.email}",
@@ -50,14 +51,14 @@ fun SignInScreen(
                     ).show()
                     navHostController.navigate(route = Screen.LogIn.route)
                 }
-                is UserViewModel.ValidationEvent.Failure -> {
+                is ValidationEvent.Failure -> {
                     Toast.makeText(
                         context,
                         userViewModel.firebaseError,
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-                is UserViewModel.ValidationEvent.Loading -> {
+                is ValidationEvent.Loading -> {
                     /* TODO: Making a loading for LoadingState */
                 }
             }
