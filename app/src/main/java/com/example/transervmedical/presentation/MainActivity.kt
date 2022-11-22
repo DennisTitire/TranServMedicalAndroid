@@ -29,6 +29,10 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStart() {
+        val currentUser = firebaseAuth.currentUser
+        if (currentUser != null) {
+            
+        }
         super.onStart()
     }
 }

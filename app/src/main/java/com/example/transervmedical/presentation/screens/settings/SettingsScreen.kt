@@ -1,5 +1,6 @@
 package com.example.transervmedical.presentation.screens.settings
 
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -20,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueButton
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SettingsScreen(
@@ -78,8 +81,13 @@ fun SettingsScreen(
             }
             Spacer(modifier = Modifier.height(24.dp))
             BlueButton(
-                onClick = { },
-                buttonText = "Log out"
+                onClick = {
+                    Log.d("Firebase", "Before signOut: ${Firebase.auth.currentUser?.uid}")
+                    Firebase.auth.signOut()
+                    Log.d("Firebase", "After signOut: ${Firebase.auth.currentUser?.uid}")
+                    navHostController.navigate(route = Screen.LogIn.route)
+                },
+                buttonText = "Sign Out"
             )
         }
     }

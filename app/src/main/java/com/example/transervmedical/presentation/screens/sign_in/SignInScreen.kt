@@ -43,16 +43,22 @@ fun SignInScreen(
         userViewModel.validationEvents.collect { event ->
             when (event) {
                 is UserViewModel.ValidationEvent.Success -> {
-                    userViewModel.registerUserToFirebase(
-                        userViewModel.registerState.email,
-                        userViewModel.registerState.password
-                    )
                     Toast.makeText(
                         context,
                         "Added user with email: ${userViewModel.registerState.email}",
                         Toast.LENGTH_SHORT
                     ).show()
                     navHostController.navigate(route = Screen.LogIn.route)
+                }
+                is UserViewModel.ValidationEvent.Failure -> {
+                    Toast.makeText(
+                        context,
+                        userViewModel.firebaseError,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is UserViewModel.ValidationEvent.Loading -> {
+                    /* TODO: Making a loading for LoadingState */
                 }
             }
         }

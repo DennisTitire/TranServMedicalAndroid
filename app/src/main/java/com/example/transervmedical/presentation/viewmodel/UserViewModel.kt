@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.transervmedical.domain.use_case.form.login.LogInFormEvent
 import com.example.transervmedical.domain.use_case.form.register.RegistrationFormEvent
 import com.example.transervmedical.domain.use_case.form.register.RegistrationUseCases
+import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
 import com.example.transervmedical.presentation.registration.LoginFormState
 import com.example.transervmedical.presentation.registration.RegistrationFormState
 import com.google.firebase.auth.FirebaseAuth
@@ -21,12 +22,12 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val registrationUseCases: RegistrationUseCases,
-//    private val userUseCases: UserUseCases,
     private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     var registerState by mutableStateOf(RegistrationFormState())
     var loginState by mutableStateOf(LoginFormState())
+    var firebaseError by mutableStateOf("")
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
@@ -65,24 +66,6 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun registerUserToRealtimeDatabase() {
-
-    }
-
-    fun registerUserToFirebase(email: String, password: String) {
-        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-            if (it.isSuccessful) {
-                Log.d("Firebase", "fail: ${it.result}")
-            } else {
-                Log.d("Firebase", "fail: ${it.result}")
-            }
-        }
-    }
-
-    fun signInUser(email: String, password: String) {
-        firebaseAuth.signInWithEmailAndPassword(email, password)
-    }
-
     private fun checkLoginValidation() {
         val emailResult = registrationUseCases.validateEmail.execute(loginState.email)
         val passwordResult = registrationUseCases.validatePassword.execute(loginState.password)
@@ -100,9 +83,20 @@ class UserViewModel @Inject constructor(
         )
         if (hasLoginError) return
 
-        viewModelScope.launch {
-            validationEventChannel.send(ValidationEvent.Success)
-        }
+        firebaseAuth.signInWithEmailAndPassword(loginState.email, loginState.password)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    viewModelScope.launch {
+                        validationEventChannel.send(ValidationEvent.Success)
+                    }
+                } else {
+                    viewModelScope.launch {
+                        Log.d("Firebase", "${it.exception?.message}")
+                        firebaseError = it.exception?.message!!
+                        validationEventChannel.send(ValidationEvent.Failure)
+                    }
+                }
+            }
     }
 
     private fun checkRegisterValidation() {
@@ -122,33 +116,34 @@ class UserViewModel @Inject constructor(
             repeatedPasswordResult
         ).any { !it.success }
 
-        if (hasRegisterError) {
-            registerState = registerState.copy(
-                emailError = emailResult.errorMessage,
-                emailErrorType = emailResult.errorType,
-                phoneNumberError = phoneNumberResult.errorMessage,
-                phoneNumberErrorType = phoneNumberResult.errorType,
-                passwordError = passwordResult.errorMessage,
-                passwordErrorType = repeatedPasswordResult.errorType,
-                repeatedPasswordError = repeatedPasswordResult.errorMessage,
-                repeatedPasswordErrorType = repeatedPasswordResult.errorType
-            )
-            return
-        }
-        viewModelScope.launch {
-            validationEventChannel.send(ValidationEvent.Success)
-        }
-    }
+        registerState = registerState.copy(
+            emailError = emailResult.errorMessage,
+            emailErrorType = emailResult.errorType,
+            phoneNumberError = phoneNumberResult.errorMessage,
+            phoneNumberErrorType = phoneNumberResult.errorType,
+            passwordError = passwordResult.errorMessage,
+            passwordErrorType = repeatedPasswordResult.errorType,
+            repeatedPasswordError = repeatedPasswordResult.errorMessage,
+            repeatedPasswordErrorType = repeatedPasswordResult.errorType
+        )
+        if (hasRegisterError) return
 
-//    fun addUserInDb(user: User) {
-//        viewModelScope.launch {
-//            userUseCases.addUserUseCase(user = user)
-//        }
-//    }
-
-    sealed class ValidationEvent {
-        object Success : ValidationEvent()
-//        object Loading : ValidationEvent()
-//        object Failure : ValidationEvent()
+        firebaseAuth.createUserWithEmailAndPassword(registerState.email, registerState.password)
+            .addOnCompleteListener { task ->
+                viewModelScope.launch {
+                    validationEventChannel.send(ValidationEvent.Loading)
+                }
+                if (task.isSuccessful) {
+                    viewModelScope.launch {
+                        validationEventChannel.send(ValidationEvent.Success)
+                    }
+                } else {
+                    viewModelScope.launch {
+                        Log.d("Firebase", "${task.exception}")
+                        firebaseError = task.exception?.message!!
+                        validationEventChannel.send(ValidationEvent.Failure)
+                    }
+                }
+            }
     }
 }
