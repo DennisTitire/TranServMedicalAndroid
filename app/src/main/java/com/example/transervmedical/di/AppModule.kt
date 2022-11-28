@@ -11,14 +11,18 @@ import com.example.transervmedical.domain.use_case.form.validation.ValidateEmail
 import com.example.transervmedical.domain.use_case.form.validation.ValidatePassword
 import com.example.transervmedical.domain.use_case.form.validation.ValidatePhoneNumber
 import com.example.transervmedical.domain.use_case.form.validation.ValidateRepeatedPassword
-import com.example.transervmedical.util.Util.DATABASE_NAME
+import com.example.transervmedical.util.Util.FIREBASE_DATABASE_URL
+import com.example.transervmedical.util.Util.USER_DATABASE
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.util.*
 import javax.inject.Singleton
 
 @Module
@@ -31,7 +35,7 @@ object AppModule {
         return Room.databaseBuilder(
             app,
             UserDatabase::class.java,
-            DATABASE_NAME
+            USER_DATABASE
         ).build()
     }
 
@@ -66,4 +70,11 @@ object AppModule {
     fun provideFirebase(): FirebaseAuth {
         return Firebase.auth
     }
+
+    @Provides
+    @Singleton
+    fun provideRealtimeDatabase(): FirebaseDatabase {
+        return Firebase.database(FIREBASE_DATABASE_URL)
+    }
+
 }

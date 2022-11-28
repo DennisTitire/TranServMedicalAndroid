@@ -10,8 +10,8 @@ import com.example.transervmedical.domain.use_case.form.login.LogInFormEvent
 import com.example.transervmedical.domain.use_case.form.register.RegistrationFormEvent
 import com.example.transervmedical.domain.use_case.form.register.RegistrationUseCases
 import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
-import com.example.transervmedical.presentation.registration.LoginFormState
-import com.example.transervmedical.presentation.registration.RegistrationFormState
+import com.example.transervmedical.presentation.states.LoginFormState
+import com.example.transervmedical.presentation.states.RegistrationFormState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel

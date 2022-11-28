@@ -1,5 +1,6 @@
 package com.example.transervmedical.presentation.screens.calendar
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,18 +22,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.transervmedical.domain.model.Calendar
 import com.example.transervmedical.navigation.Screen
+import com.example.transervmedical.presentation.viewmodel.CalendarViewModel
 import com.example.transervmedical.ui.theme.Blue
-import java.text.SimpleDateFormat
+import com.example.transervmedical.util.Util.formatTime
 import java.util.*
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalFoundationApi
 @Composable
 fun CalendarScreen(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    calendarViewModel: CalendarViewModel = hiltViewModel()
 ) {
+    val calendarList = calendarViewModel.calendarEventList
     val lazyListState = rememberLazyListState()
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(text = "Calendar", fontSize = 32.sp) },
@@ -60,13 +68,14 @@ fun CalendarScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colors.background)
         ) {
-            calendarListEvents.forEach { event ->
+            calendarViewModel.getDatabaseData()
+            calendarList.forEach { event ->
                 item {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = event.day,
+                            text = event?.calendarId!!,
                             style = MaterialTheme.typography.h5,
                             color = if (isSystemInDarkTheme()) Color.White else Color.Black
                         )
@@ -81,7 +90,7 @@ fun CalendarScreen(
 @ExperimentalFoundationApi
 @Composable
 fun LazyItemScope.CalendarEventItem(
-    event: CalendarEvent
+    event: Calendar
 ) {
     Card(
         modifier = Modifier
@@ -103,7 +112,9 @@ fun LazyItemScope.CalendarEventItem(
             Spacer(modifier = Modifier.width(4.dp))
             Column(
                 modifier = Modifier
-                    .clickable {  /* TODO */ }
+                    .clickable {
+                        /* TODO: Click on Calendar Item */
+                    }
                     .padding(12.dp)
                     .fillMaxWidth()
             ) {
@@ -115,7 +126,15 @@ fun LazyItemScope.CalendarEventItem(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (event.allDay) "All day" else "from ${event.start} to ${event.end}",
+                    text = formatEventStartEnd(
+                        start = event.startEvent ?: 0,
+                        end = event.endEvent ?: 0,
+                        allDay = event.allDay
+                    ),
+                    style = MaterialTheme.typography.body1,
+                )
+                Text(
+                    text = event.description ?: "",
                     style = MaterialTheme.typography.body1,
                 )
             }
@@ -123,138 +142,11 @@ fun LazyItemScope.CalendarEventItem(
     }
 }
 
+fun formatEventStartEnd(start: Long, end: Long, allDay: Boolean): String {
+    return if (allDay)
+        "All day"
+    else "%1 - %2"
+    start.formatTime()
+    end.formatTime()
 
-data class CalendarEvent(
-    val id: Long,
-    val title: String,
-    val description: String?,
-    val start: Long,
-    val end: Long,
-    val location: String?,
-    val allDay: Boolean = false,
-    val color: Int = 0xFF2965,
-    val recurring: Boolean = false,
-    val frequency: String = "",
-    val day: String
-)
-
-// CalendarUtil
-//fun formatEventStartEnd(start: Long, end: Long, location: String?, allDay: Boolean): String {
-//    return if (allDay)
-//        "All day"
-//    else
-//            if (!location.isNullOrBlank())
-//                    "%1$s - %2$s at %3\$"
-//            else "%1$s - %2$s",
-//            start.formatTime(),
-//            end.formatTime(),
-//            location ?: ""
-//
-//}
-
-fun Long.formatTime(): String {
-    val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
-    val sdfNoMinutes = SimpleDateFormat("h a", Locale.getDefault())
-    val minutes = SimpleDateFormat("mm", Locale.getDefault()).format(this)
-    return if (minutes == "00") sdfNoMinutes.format(this) else sdf.format(this)
 }
-
-//fun getString(
-//    @StringRes
-//    resId: Int,
-//    vararg args: String
-//) = MainActivity.appContext.getString(resId, *args)
-
-val calendarListEvents = listOf(
-    CalendarEvent(
-        id = 0,
-        title = "Shopping",
-        description = "asdf",
-        start = 12312,
-        end = 123142,
-        location = null,
-        allDay = true,
-        color = 0xFF2965,
-        recurring = true,
-        frequency = "",
-        day = "Monday"
-    ),
-    CalendarEvent(
-        id = 1,
-        title = "Gym",
-        description = "",
-        start = 123422,
-        end = 12324312,
-        location = null,
-        allDay = true,
-        color = 0xFFFF98,
-        recurring = true,
-        frequency = "",
-        day = "Tuesday"
-    ),
-    CalendarEvent(
-        id = 2,
-        title = "Lunch",
-        description = "",
-        start = 768,
-        end = 456092,
-        location = null,
-        allDay = true,
-        color = 0xFF1E96,
-        recurring = true,
-        frequency = "",
-        day = "Wednesday"
-    ),
-    CalendarEvent(
-        id = 2,
-        title = "Lunch",
-        description = "",
-        start = 768,
-        end = 456092,
-        location = null,
-        allDay = true,
-        color = 0xFF1E96,
-        recurring = true,
-        frequency = "",
-        day = "Wednesday"
-    ),
-    CalendarEvent(
-        id = 2,
-        title = "Lunch",
-        description = "",
-        start = 768,
-        end = 456092,
-        location = null,
-        allDay = true,
-        color = 0xFF1E96,
-        recurring = true,
-        frequency = "",
-        day = "Wednesday"
-    ),
-    CalendarEvent(
-        id = 2,
-        title = "Lunch",
-        description = "",
-        start = 768,
-        end = 456092,
-        location = null,
-        allDay = true,
-        color = 0xFF1E96,
-        recurring = true,
-        frequency = "",
-        day = "Wednesday"
-    ),
-    CalendarEvent(
-        id = 2,
-        title = "Lunch",
-        description = "",
-        start = 768,
-        end = 456092,
-        location = null,
-        allDay = true,
-        color = 0xFF1E96,
-        recurring = true,
-        frequency = "",
-        day = "Wednesday"
-    )
-)

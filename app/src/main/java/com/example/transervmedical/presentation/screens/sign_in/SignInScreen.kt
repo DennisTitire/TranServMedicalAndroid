@@ -1,5 +1,6 @@
 package com.example.transervmedical.presentation.screens.sign_in
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,7 @@ import com.example.transervmedical.presentation.screens.components.ReusableCompo
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextPasswordOutline
 import com.example.transervmedical.presentation.viewmodel.UserViewModel
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SignInScreen(
     navHostController: NavHostController,

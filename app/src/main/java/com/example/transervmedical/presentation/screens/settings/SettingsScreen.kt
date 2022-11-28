@@ -1,5 +1,6 @@
 package com.example.transervmedical.presentation.screens.settings
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import com.example.transervmedical.presentation.screens.components.ReusableCompo
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SettingsScreen(
     navHostController: NavHostController

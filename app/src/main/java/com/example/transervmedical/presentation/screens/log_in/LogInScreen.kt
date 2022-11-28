@@ -178,5 +178,4 @@ fun LogInScreen(
             )
         }
     }
-
 }

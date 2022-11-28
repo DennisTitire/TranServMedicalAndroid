@@ -1,5 +1,6 @@
 package com.example.transervmedical.presentation.screens.dashboard
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,7 @@ import com.example.transervmedical.ui.theme.Blue
 import com.example.transervmedical.ui.theme.Orange
 import com.example.transervmedical.ui.theme.Red
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun DashboardScreen(
     navHostController: NavHostController

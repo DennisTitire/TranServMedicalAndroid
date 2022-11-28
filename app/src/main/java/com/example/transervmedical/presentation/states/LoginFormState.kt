@@ -1,4 +1,4 @@
-package com.example.transervmedical.presentation.registration
+package com.example.transervmedical.presentation.states
 
 data class LoginFormState(
     val email: String = "",

@@ -100,4 +100,7 @@ dependencies {
     // Firebase Auth
     implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
+
+    // MaterialDialog for date and time
+    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
 }
