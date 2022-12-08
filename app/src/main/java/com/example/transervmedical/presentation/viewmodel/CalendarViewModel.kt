@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.example.transervmedical.domain.model.Calendar
 import com.example.transervmedical.domain.use_case.calendar.CalendarEvent
 import com.example.transervmedical.presentation.states.CalendarState
+import com.example.transervmedical.util.Util.HOUR_IN_MILLIS
 import com.example.transervmedical.util.Util.provideCalendarId
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -20,10 +21,13 @@ import javax.inject.Inject
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val database: FirebaseDatabase
+    private val database: FirebaseDatabase,
 ) : ViewModel() {
 
-    var calendarState by mutableStateOf(CalendarState())
+    var calendarState by mutableStateOf(CalendarState(
+        startEvent = System.currentTimeMillis() + HOUR_IN_MILLIS,
+        endEvent = System.currentTimeMillis() + 2 * HOUR_IN_MILLIS
+    ))
     private val userId = firebaseAuth.currentUser?.uid
     private val databaseRef = database.getReference("calendarEvents")
     var calendarEventList = ArrayList<Calendar?>()
@@ -60,7 +64,7 @@ class CalendarViewModel @Inject constructor(
             calendarObject = Calendar(
                 calendarId = calendarId,
                 title = calendarState.title,
-                startEvent = calendarState.endEvent,
+                startEvent = calendarState.startEvent,
                 endEvent = calendarState.endEvent,
                 allDay = calendarState.allDay,
                 description = calendarState.description

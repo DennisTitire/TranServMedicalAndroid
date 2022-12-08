@@ -13,6 +13,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -42,10 +43,21 @@ import java.util.*
 @Composable
 fun AddEventScreen(
     navHostController: NavHostController,
-    calendarViewModel: CalendarViewModel = hiltViewModel()
+    calendarViewModel: CalendarViewModel = hiltViewModel(),
 ) {
     val focusManager = LocalFocusManager.current
     val calendarState = calendarViewModel.calendarState
+
+    var startDate by rememberSaveable {
+        mutableStateOf(
+            calendarState.startEvent
+        )
+    }
+    var endDate by rememberSaveable {
+        mutableStateOf(
+            calendarState.endEvent
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -120,16 +132,21 @@ fun AddEventScreen(
                 AnimatedVisibility(visible = !calendarState.allDay) {
                     EventTimeSection(
                         start = Calendar.getInstance().apply {
-                            timeInMillis =
-                                calendarState.startEvent
-                                    ?: (System.currentTimeMillis() + HOUR_IN_MILLIS)
+                            timeInMillis = startDate
                         },
                         end = Calendar.getInstance().apply {
-                            timeInMillis = calendarState.endEvent
-                                ?: (System.currentTimeMillis() + 2 * HOUR_IN_MILLIS)
+                            timeInMillis = endDate
                         },
-                        onStartDateSelected = { calendarState.startEvent = it.timeInMillis },
-                        onEndDateSelected = { calendarState.endEvent = it.timeInMillis },
+                        onStartDateSelected = {
+                            startDate = it.timeInMillis
+                            calendarState.startEvent = startDate
+                            calendarViewModel.onCalendarEvent(CalendarEvent.StartEvent(calendarState.startEvent))
+                        },
+                        onEndDateSelected = {
+                            endDate = it.timeInMillis
+                            calendarState.endEvent = endDate
+                            calendarViewModel.onCalendarEvent(CalendarEvent.EndEvent(calendarState.endEvent))
+                        },
                     )
                 }
                 EditTextEmailOutline(
@@ -290,7 +307,7 @@ fun EventTimeSection(
 fun showDatePicker(
     initialDate: Calendar,
     context: Context,
-    onDateSelected: (Calendar) -> Unit
+    onDateSelected: (Calendar) -> Unit,
 ) {
     val tempDate = Calendar.getInstance()
     val datePicker = DatePickerDialog(
@@ -311,7 +328,7 @@ fun showDatePicker(
 fun showTimePicker(
     initialDate: Calendar,
     context: Context,
-    onTimeSelected: (Calendar) -> Unit
+    onTimeSelected: (Calendar) -> Unit,
 ) {
     val tempDate = Calendar.getInstance()
     val timePicker = TimePickerDialog(
@@ -443,5 +460,4 @@ fun DatePikerDialog(
         }
     }
 }
-
  */

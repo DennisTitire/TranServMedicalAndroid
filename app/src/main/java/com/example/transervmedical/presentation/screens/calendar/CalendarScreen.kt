@@ -36,7 +36,7 @@ import java.util.*
 @Composable
 fun CalendarScreen(
     navHostController: NavHostController,
-    calendarViewModel: CalendarViewModel = hiltViewModel()
+    calendarViewModel: CalendarViewModel = hiltViewModel(),
 ) {
     val calendarList = calendarViewModel.calendarEventList
     val lazyListState = rememberLazyListState()
@@ -90,7 +90,7 @@ fun CalendarScreen(
 @ExperimentalFoundationApi
 @Composable
 fun LazyItemScope.CalendarEventItem(
-    event: Calendar
+    event: Calendar,
 ) {
     Card(
         modifier = Modifier
@@ -145,8 +145,7 @@ fun LazyItemScope.CalendarEventItem(
 fun formatEventStartEnd(start: Long, end: Long, allDay: Boolean): String {
     return if (allDay)
         "All day"
-    else "%1 - %2"
-    start.formatTime()
-    end.formatTime()
+    else
+        start.formatTime() + " - " + end.formatTime()
 
 }
