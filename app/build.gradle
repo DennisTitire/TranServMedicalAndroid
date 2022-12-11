@@ -103,4 +103,6 @@ dependencies {
 
     // MaterialDialog for date and time
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
+
+    implementation 'com.google.code.gson:gson:2.8.6'
 }

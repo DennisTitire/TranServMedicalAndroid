@@ -25,7 +25,7 @@ import com.example.transervmedical.ui.theme.Red
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun DashboardScreen(
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
     Scaffold(
         topBar = {

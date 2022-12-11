@@ -9,6 +9,9 @@ object Util {
     const val CALENDAR_DATABASE = "calendar_database"
     const val FIREBASE_DATABASE_URL ="https://transervmedical-default-rtdb.europe-west1.firebasedatabase.app/"
 
+    // Navigation
+    const val CALENDAR_EVENT_ARG = "calendar_event"
+
     const val HOUR_IN_MILLIS = 60 * 60 * 1000L
 
     fun Long.formatDateForMapping(): String {
@@ -21,6 +24,14 @@ object Util {
         val sdfNoMinutes = SimpleDateFormat("h a", Locale.getDefault())
         val minutes = SimpleDateFormat("mm", Locale.getDefault()).format(this)
         return if (minutes == "00") sdfNoMinutes.format(this) else sdf.format(this)
+    }
+
+    fun formatEventStartEnd(start: Long, end: Long, allDay: Boolean): String {
+        return if (allDay)
+            "All day"
+        else
+            start.formatTime() + " - " + end.formatTime()
+
     }
 
     fun Long.formatDate(): String {

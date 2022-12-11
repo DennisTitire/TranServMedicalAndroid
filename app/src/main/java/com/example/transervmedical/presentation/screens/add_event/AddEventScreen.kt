@@ -61,7 +61,8 @@ fun AddEventScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Calendar Event", fontSize = 32.sp) },
+            TopAppBar(
+                title = { Text(text = "Calendar Event", fontSize = 32.sp) },
                 backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
                 contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 navigationIcon = {
@@ -74,7 +75,16 @@ fun AddEventScreen(
                             contentDescription = "Back button"
                         )
                     }
-                }
+                },
+//                actions = {
+//                    if (calendarState.calendarId != null) {
+//                        IconButton(onClick = { /*TODO*/ }) {
+//                            Icon(
+//                                imageVector = Icons.Default.Delete,
+//                                contentDescription = "Delete button")
+//                        }
+//                    }
+//                }
             )
         }
     ) {

@@ -1,6 +1,7 @@
 package com.example.transervmedical.presentation.screens.calendar
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,7 +39,8 @@ fun CalendarScreen(
     navHostController: NavHostController,
     calendarViewModel: CalendarViewModel = hiltViewModel(),
 ) {
-    val calendarList = calendarViewModel.calendarEventList
+    val state = calendarViewModel.uiState
+//    val calendarList = calendarViewModel.calendarEventList
     val lazyListState = rememberLazyListState()
 
     Scaffold(
@@ -68,18 +70,22 @@ fun CalendarScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colors.background)
         ) {
-            calendarViewModel.getDatabaseData()
-            calendarList.forEach { event ->
+            calendarViewModel.getAllCalendarEventsFromDb()
+            state.dashboardEvents.forEach { (day, events) ->
                 item {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            text = event?.calendarId!!,
-                            style = MaterialTheme.typography.h5,
-                            color = if (isSystemInDarkTheme()) Color.White else Color.Black
+                            text = day.substring(0, day.indexOf(",")),
+                            style = MaterialTheme.typography.h5
                         )
-                        CalendarEventItem(event = event)
+                        Log.d("Dash", "day event = $day")
+                        events.forEach { event ->
+                            CalendarEventItem(
+                                event = event
+                            )
+                        }
                     }
                 }
             }
@@ -91,6 +97,7 @@ fun CalendarScreen(
 @Composable
 fun LazyItemScope.CalendarEventItem(
     event: Calendar,
+    //onClick: (Calendar) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -112,9 +119,7 @@ fun LazyItemScope.CalendarEventItem(
             Spacer(modifier = Modifier.width(4.dp))
             Column(
                 modifier = Modifier
-                    .clickable {
-                        /* TODO: Click on Calendar Item */
-                    }
+                    .clickable { /* TODO: Click on calendar item */ }
                     .padding(12.dp)
                     .fillMaxWidth()
             ) {
