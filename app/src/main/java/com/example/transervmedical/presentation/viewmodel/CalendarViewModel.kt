@@ -12,7 +12,10 @@ import com.example.transervmedical.domain.use_case.calendar.CalendarUseCases
 import com.example.transervmedical.presentation.states.CalendarState
 import com.example.transervmedical.util.Util.provideCalendarId
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,6 +33,10 @@ class CalendarViewModel @Inject constructor(
     private val userId = firebaseAuth.currentUser?.uid
     private val databaseRef = database.getReference("calendarEvents")
     // var calendarEventList = ArrayList<Calendar?>()
+
+    init {
+        getDatabaseData()
+    }
 
     fun onCalendarEvent(calendarEvent: CalendarEvent) {
         when (calendarEvent) {
@@ -50,7 +57,6 @@ class CalendarViewModel @Inject constructor(
             }
             is CalendarEvent.AddCalendarEvent -> {
                 addCalendarEvent()
-                //getDatabaseData()
                 getAllCalendarEventsFromDb()
             }
         }
@@ -73,8 +79,8 @@ class CalendarViewModel @Inject constructor(
             calendarObject = Calendar(
                 calendarId = calendarId,
                 title = calendarState.title,
-                startEvent = 0,
-                endEvent = 0,
+                startEvent = System.currentTimeMillis(),
+                endEvent = System.currentTimeMillis(),
                 allDay = calendarState.allDay,
                 description = calendarState.description
             )
@@ -90,24 +96,20 @@ class CalendarViewModel @Inject constructor(
             }
     }
 
-    /*
-    fun getDatabaseData() {
+
+    private fun getDatabaseData() {
         // snapshot data receive
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (data in snapshot.children) {
                     val calendar = data.getValue(Calendar::class.java)
+                    Log.d("asdf", "calendar : $calendar")
                     //calendarEventList.add(calendar)
-                    viewModelScope.launch {
-                        calendarUseCases.getAllCalendarEvents
+                    if (calendar != null) {
+                        viewModelScope.launch {
+                            calendarUseCases.addCalendarEvent(calendar)
+                        }
                     }
-                    /*
-                    Log.d("Firebase", "Get calendarObj: $calendarStateWithoutLocal")
-                    Log.d("Firebase", "Get calendarObj.id: ${calendarStateWithoutLocal?.calendarId}")
-                    Log.d("Firebase", "Get calendarObj.allDay: ${calendarStateWithoutLocal?.allDay}")
-                    Log.d("Firebase", "Get calendarObj.title: ${calendarStateWithoutLocal?.title}")
-                    Log.d("Firebase", "Get calendarObj.desc: ${calendarStateWithoutLocal?.description}")
-                     */
                 }
             }
 
@@ -116,13 +118,20 @@ class CalendarViewModel @Inject constructor(
             }
         })
     }
-     */
+
 
     fun getAllCalendarEventsFromDb() = viewModelScope.launch {
         val events = calendarUseCases.getAllCalendarEvents.invoke()
         uiState = uiState.copy(
             dashboardEvents = events
         )
+    }
+
+    fun getUserEmail(): String? {
+        return if (firebaseAuth.currentUser != null)
+            firebaseAuth.currentUser!!.email
+        else
+            "No user is logged in"
     }
 
     data class UiState(

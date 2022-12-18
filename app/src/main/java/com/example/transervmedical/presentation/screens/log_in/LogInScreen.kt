@@ -57,6 +57,7 @@ fun LogInScreen(
                         Toast.LENGTH_SHORT
                     ).show()
                     navHostController.navigate(route = Screen.Dashboard.route)
+                    navHostController.popBackStack()
                 }
                 is ValidationEvent.Failure -> {
                     Toast.makeText(

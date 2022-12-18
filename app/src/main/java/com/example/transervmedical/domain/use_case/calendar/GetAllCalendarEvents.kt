@@ -9,8 +9,10 @@ class GetAllCalendarEvents @Inject constructor(
     private val calendarRepository: CalendarRepository,
 ) {
     suspend operator fun invoke(): Map<String, List<Calendar>> {
-        return calendarRepository.getAllCalendarEvents().groupBy { event ->
-            event.startEvent?.formatDateForMapping() ?: "Nu avem ce face"
-        }
+        return calendarRepository.getAllCalendarEvents()
+            .sortedBy { it.startEvent }
+            .groupBy { event ->
+                event.startEvent?.formatDateForMapping() ?: "Nu avem ce face"
+            }
     }
 }

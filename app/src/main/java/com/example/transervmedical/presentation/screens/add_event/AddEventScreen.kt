@@ -184,6 +184,7 @@ fun AddEventScreen(
                 BlueButton(
                     onClick = {
                         calendarViewModel.onCalendarEvent(CalendarEvent.AddCalendarEvent)
+                        navHostController.navigate(route = Screen.Dashboard.route)
                     },
                     buttonText = "Save Event"
                 )
