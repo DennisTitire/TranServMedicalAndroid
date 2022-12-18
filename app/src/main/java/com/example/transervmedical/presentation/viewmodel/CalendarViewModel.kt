@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.transervmedical.domain.model.Calendar
 import com.example.transervmedical.domain.use_case.calendar.CalendarEvent
 import com.example.transervmedical.domain.use_case.calendar.CalendarUseCases
+import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
 import com.example.transervmedical.presentation.states.CalendarState
 import com.example.transervmedical.util.Util.provideCalendarId
 import com.google.firebase.auth.FirebaseAuth
@@ -17,6 +18,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,7 +35,9 @@ class CalendarViewModel @Inject constructor(
     var calendarState by mutableStateOf(CalendarState())
     private val userId = firebaseAuth.currentUser?.uid
     private val databaseRef = database.getReference("calendarEvents")
-    // var calendarEventList = ArrayList<Calendar?>()
+    var calendarEventError by mutableStateOf("No network error")
+    private val validationEventChannel = Channel<ValidationEvent>()
+    val validationEvents = validationEventChannel.receiveAsFlow()
 
     init {
         getDatabaseData()
@@ -88,10 +93,15 @@ class CalendarViewModel @Inject constructor(
         databaseRef.child("$userId-$calendarId").setValue(calendarObject)
             .addOnCompleteListener {
                 viewModelScope.launch {
+                    validationEventChannel.send(ValidationEvent.Success)
                     calendarUseCases.addCalendarEvent.invoke(calendarObject)
                 }
                 Log.d("Firebase", "Complete Message: ${it.exception}")
             }.addOnFailureListener {
+                viewModelScope.launch {
+                calendarEventError = it.message.toString()
+                    validationEventChannel.send(ValidationEvent.Failure)
+                }
                 Log.d("Firebase", "Failure Message: ${it.message}")
             }
     }
@@ -104,7 +114,6 @@ class CalendarViewModel @Inject constructor(
                 for (data in snapshot.children) {
                     val calendar = data.getValue(Calendar::class.java)
                     Log.d("asdf", "calendar : $calendar")
-                    //calendarEventList.add(calendar)
                     if (calendar != null) {
                         viewModelScope.launch {
                             calendarUseCases.addCalendarEvent(calendar)
@@ -114,6 +123,10 @@ class CalendarViewModel @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
+                calendarEventError = error.message
+                viewModelScope.launch {
+                    validationEventChannel.send(ValidationEvent.Failure)
+                }
                 Log.d("Firebase", "Error: ${error.message}")
             }
         })

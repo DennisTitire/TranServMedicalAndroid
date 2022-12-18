@@ -40,7 +40,6 @@ fun CalendarScreen(
     calendarViewModel: CalendarViewModel = hiltViewModel(),
 ) {
     val state = calendarViewModel.uiState
-//    val calendarList = calendarViewModel.calendarEventList
     val lazyListState = rememberLazyListState()
 
     Scaffold(

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.transervmedical.R
 import com.example.transervmedical.domain.use_case.calendar.CalendarEvent
+import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
 import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueButton
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextEmailOutline
@@ -47,6 +49,7 @@ fun AddEventScreen(
 ) {
     val focusManager = LocalFocusManager.current
     val calendarState = calendarViewModel.calendarState
+    val context = LocalContext.current
 
     var startDate by rememberSaveable {
         mutableStateOf(
@@ -57,6 +60,27 @@ fun AddEventScreen(
         mutableStateOf(
             calendarState.endEvent
         )
+    }
+
+    LaunchedEffect(key1 = true) {
+        calendarViewModel.validationEvents.collect{ event ->
+            when(event) {
+                is ValidationEvent.Success -> {
+                    navHostController.navigate(route = Screen.Dashboard.route)
+                }
+                is ValidationEvent.Failure -> {
+                    Toast.makeText(
+                        context,
+                        calendarViewModel.calendarEventError,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is ValidationEvent.Loading -> {
+                    // TODO: Need to implement
+                }
+            }
+
+        }
     }
 
     Scaffold(
@@ -184,7 +208,6 @@ fun AddEventScreen(
                 BlueButton(
                     onClick = {
                         calendarViewModel.onCalendarEvent(CalendarEvent.AddCalendarEvent)
-                        navHostController.navigate(route = Screen.Dashboard.route)
                     },
                     buttonText = "Save Event"
                 )
