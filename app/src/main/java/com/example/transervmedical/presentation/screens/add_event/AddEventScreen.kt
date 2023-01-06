@@ -39,7 +39,6 @@ import com.example.transervmedical.ui.theme.Blue
 import com.example.transervmedical.util.Util.HOUR_IN_MILLIS
 import com.example.transervmedical.util.Util.formatDate
 import com.example.transervmedical.util.Util.formatTime
-import java.util.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -47,24 +46,34 @@ fun AddEventScreen(
     navHostController: NavHostController,
     calendarViewModel: CalendarViewModel = hiltViewModel(),
 ) {
-    val focusManager = LocalFocusManager.current
-    val calendarState = calendarViewModel.calendarState
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    val scaffoldState = rememberScaffoldState()
+    var calendarState = calendarViewModel.calendarState
+    val calendarEvent = calendarViewModel.selectedCalendarEvent.collectAsState().value
 
     var startDate by rememberSaveable {
         mutableStateOf(
-            calendarState.startEvent
+            calendarState.startEvent ?: (System.currentTimeMillis() + HOUR_IN_MILLIS)
         )
     }
     var endDate by rememberSaveable {
         mutableStateOf(
-            calendarState.endEvent
+            calendarState.endEvent ?: (System.currentTimeMillis() + 2 * HOUR_IN_MILLIS)
         )
     }
 
+    if (calendarEvent != null) {
+        calendarState.title = calendarEvent.title
+        calendarState.allDay = calendarEvent.allDay
+        calendarState.startEvent = calendarEvent.startEvent
+        calendarState.endEvent = calendarEvent.endEvent
+        calendarState.description = calendarEvent.description
+    }
+
     LaunchedEffect(key1 = true) {
-        calendarViewModel.validationEvents.collect{ event ->
-            when(event) {
+        calendarViewModel.validationEvents.collect { event ->
+            when (event) {
                 is ValidationEvent.Success -> {
                     navHostController.navigate(route = Screen.Dashboard.route)
                 }
@@ -79,11 +88,11 @@ fun AddEventScreen(
                     // TODO: Need to implement
                 }
             }
-
         }
     }
 
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
                 title = { Text(text = "Calendar Event", fontSize = 32.sp) },
@@ -91,7 +100,11 @@ fun AddEventScreen(
                 contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 navigationIcon = {
                     IconButton(onClick = {
-                        navHostController.navigate(Screen.Dashboard.route)
+                        if (calendarEvent != null) {
+                            navHostController.navigate(Screen.Calendar.route)
+                        } else {
+                            navHostController.navigate(Screen.Dashboard.route)
+                        }
                     }) {
                         Icon(
                             modifier = Modifier.size(32.dp),
@@ -121,7 +134,7 @@ fun AddEventScreen(
         ) {
             EditTextEmailOutline(
                 value = calendarState.title,
-                onValueChange = { calendarViewModel.onCalendarEvent(CalendarEvent.TitleChanged(it)) },
+                onValueChange = { calendarViewModel.onCalendarEvent(CalendarEvent.TitleChanged(title = it)) },
                 label = "Title",
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(
@@ -165,21 +178,17 @@ fun AddEventScreen(
                 }
                 AnimatedVisibility(visible = !calendarState.allDay) {
                     EventTimeSection(
-                        start = Calendar.getInstance().apply {
+                        start = java.util.Calendar.getInstance().apply {
                             timeInMillis = startDate
                         },
-                        end = Calendar.getInstance().apply {
+                        end = java.util.Calendar.getInstance().apply {
                             timeInMillis = endDate
                         },
                         onStartDateSelected = {
                             startDate = it.timeInMillis
-                            calendarState.startEvent = startDate
-                            calendarViewModel.onCalendarEvent(CalendarEvent.StartEvent(calendarState.startEvent))
                         },
                         onEndDateSelected = {
                             endDate = it.timeInMillis
-                            calendarState.endEvent = endDate
-                            calendarViewModel.onCalendarEvent(CalendarEvent.EndEvent(calendarState.endEvent))
                         },
                     )
                 }
@@ -207,9 +216,14 @@ fun AddEventScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 BlueButton(
                     onClick = {
-                        calendarViewModel.onCalendarEvent(CalendarEvent.AddCalendarEvent)
+                        if (calendarEvent != null) {
+                            // updateEvent
+                        } else {
+                            calendarViewModel.onCalendarEvent(CalendarEvent.AddCalendarEvent)
+                        }
                     },
-                    buttonText = "Save Event"
+                    buttonText = if(calendarEvent != null) "Update Event" else "Add Event"
+
                 )
             }
         }
@@ -218,10 +232,10 @@ fun AddEventScreen(
 
 @Composable
 fun EventTimeSection(
-    start: Calendar,
-    end: Calendar,
-    onStartDateSelected: (Calendar) -> Unit,
-    onEndDateSelected: (Calendar) -> Unit,
+    start: java.util.Calendar,
+    end: java.util.Calendar,
+    onStartDateSelected: (java.util.Calendar) -> Unit,
+    onEndDateSelected: (java.util.Calendar) -> Unit,
 ) {
     val context = LocalContext.current
     Column {
@@ -236,15 +250,18 @@ fun EventTimeSection(
                 modifier = Modifier
                     .clickable {
                         showDatePicker(start, context) {
-                            val newEvent = Calendar
+                            val newEvent = java.util.Calendar
                                 .getInstance()
                                 .apply {
-                                    this[Calendar.YEAR] = it[Calendar.YEAR]
-                                    this[Calendar.MONTH] = it[Calendar.MONTH]
-                                    this[Calendar.DAY_OF_MONTH] = it[Calendar.DAY_OF_MONTH]
+                                    this[java.util.Calendar.YEAR] = it[java.util.Calendar.YEAR]
+                                    this[java.util.Calendar.MONTH] = it[java.util.Calendar.MONTH]
+                                    this[java.util.Calendar.DAY_OF_MONTH] =
+                                        it[java.util.Calendar.DAY_OF_MONTH]
 
-                                    this[Calendar.HOUR_OF_DAY] = start[Calendar.HOUR_OF_DAY]
-                                    this[Calendar.MINUTE] = start[Calendar.MINUTE]
+                                    this[java.util.Calendar.HOUR_OF_DAY] =
+                                        start[java.util.Calendar.HOUR_OF_DAY]
+                                    this[java.util.Calendar.MINUTE] =
+                                        start[java.util.Calendar.MINUTE]
                                 }
                             onStartDateSelected(
                                 newEvent
@@ -262,15 +279,17 @@ fun EventTimeSection(
                 modifier = Modifier
                     .clickable {
                         showTimePicker(start, context) {
-                            val newEvent = Calendar
+                            val newEvent = java.util.Calendar
                                 .getInstance()
                                 .apply {
-                                    this[Calendar.HOUR_OF_DAY] = it[Calendar.HOUR_OF_DAY]
-                                    this[Calendar.MINUTE] = it[Calendar.MINUTE]
+                                    this[java.util.Calendar.HOUR_OF_DAY] =
+                                        it[java.util.Calendar.HOUR_OF_DAY]
+                                    this[java.util.Calendar.MINUTE] = it[java.util.Calendar.MINUTE]
 
-                                    this[Calendar.YEAR] = start[Calendar.YEAR]
-                                    this[Calendar.MONTH] = start[Calendar.MONTH]
-                                    this[Calendar.DAY_OF_MONTH] = start[Calendar.DAY_OF_MONTH]
+                                    this[java.util.Calendar.YEAR] = start[java.util.Calendar.YEAR]
+                                    this[java.util.Calendar.MONTH] = start[java.util.Calendar.MONTH]
+                                    this[java.util.Calendar.DAY_OF_MONTH] =
+                                        start[java.util.Calendar.DAY_OF_MONTH]
                                 }
                             onStartDateSelected(newEvent)
                             if (newEvent.timeInMillis > end.timeInMillis) {
@@ -292,15 +311,17 @@ fun EventTimeSection(
                 modifier = Modifier
                     .clickable {
                         showDatePicker(end, context) {
-                            val newEvent = Calendar
+                            val newEvent = java.util.Calendar
                                 .getInstance()
                                 .apply {
-                                    this[Calendar.YEAR] = it[Calendar.YEAR]
-                                    this[Calendar.MONTH] = it[Calendar.MONTH]
-                                    this[Calendar.DAY_OF_MONTH] = it[Calendar.DAY_OF_MONTH]
+                                    this[java.util.Calendar.YEAR] = it[java.util.Calendar.YEAR]
+                                    this[java.util.Calendar.MONTH] = it[java.util.Calendar.MONTH]
+                                    this[java.util.Calendar.DAY_OF_MONTH] =
+                                        it[java.util.Calendar.DAY_OF_MONTH]
 
-                                    this[Calendar.HOUR_OF_DAY] = end[Calendar.HOUR_OF_DAY]
-                                    this[Calendar.MINUTE] = end[Calendar.MINUTE]
+                                    this[java.util.Calendar.HOUR_OF_DAY] =
+                                        end[java.util.Calendar.HOUR_OF_DAY]
+                                    this[java.util.Calendar.MINUTE] = end[java.util.Calendar.MINUTE]
                                 }
                             onEndDateSelected(newEvent)
                             if (newEvent.timeInMillis < start.timeInMillis) {
@@ -316,15 +337,17 @@ fun EventTimeSection(
                 modifier = Modifier
                     .clickable {
                         showTimePicker(end, context) {
-                            val newEvent = Calendar
+                            val newEvent = java.util.Calendar
                                 .getInstance()
                                 .apply {
-                                    this[Calendar.HOUR_OF_DAY] = it[Calendar.HOUR_OF_DAY]
-                                    this[Calendar.MINUTE] = it[Calendar.MINUTE]
+                                    this[java.util.Calendar.HOUR_OF_DAY] =
+                                        it[java.util.Calendar.HOUR_OF_DAY]
+                                    this[java.util.Calendar.MINUTE] = it[java.util.Calendar.MINUTE]
 
-                                    this[Calendar.YEAR] = end[Calendar.YEAR]
-                                    this[Calendar.MONTH] = end[Calendar.MONTH]
-                                    this[Calendar.DAY_OF_MONTH] = end[Calendar.DAY_OF_MONTH]
+                                    this[java.util.Calendar.YEAR] = end[java.util.Calendar.YEAR]
+                                    this[java.util.Calendar.MONTH] = end[java.util.Calendar.MONTH]
+                                    this[java.util.Calendar.DAY_OF_MONTH] =
+                                        end[java.util.Calendar.DAY_OF_MONTH]
                                 }
                             onEndDateSelected(newEvent)
                             if (newEvent.timeInMillis < start.timeInMillis) {
@@ -339,41 +362,41 @@ fun EventTimeSection(
 }
 
 fun showDatePicker(
-    initialDate: Calendar,
+    initialDate: java.util.Calendar,
     context: Context,
-    onDateSelected: (Calendar) -> Unit,
+    onDateSelected: (java.util.Calendar) -> Unit,
 ) {
-    val tempDate = Calendar.getInstance()
+    val tempDate = java.util.Calendar.getInstance()
     val datePicker = DatePickerDialog(
         context,
         { _, year, month, day ->
-            tempDate[Calendar.YEAR] = year
-            tempDate[Calendar.MONTH] = month
-            tempDate[Calendar.DAY_OF_MONTH] = day
+            tempDate[java.util.Calendar.YEAR] = year
+            tempDate[java.util.Calendar.MONTH] = month
+            tempDate[java.util.Calendar.DAY_OF_MONTH] = day
             onDateSelected(tempDate)
         },
-        initialDate[Calendar.YEAR],
-        initialDate[Calendar.MONTH],
-        initialDate[Calendar.DAY_OF_MONTH]
+        initialDate[java.util.Calendar.YEAR],
+        initialDate[java.util.Calendar.MONTH],
+        initialDate[java.util.Calendar.DAY_OF_MONTH]
     )
     datePicker.show()
 }
 
 fun showTimePicker(
-    initialDate: Calendar,
+    initialDate: java.util.Calendar,
     context: Context,
-    onTimeSelected: (Calendar) -> Unit,
+    onTimeSelected: (java.util.Calendar) -> Unit,
 ) {
-    val tempDate = Calendar.getInstance()
+    val tempDate = java.util.Calendar.getInstance()
     val timePicker = TimePickerDialog(
         context,
         { _, hour, minute ->
-            tempDate[Calendar.HOUR_OF_DAY] = hour
-            tempDate[Calendar.MINUTE] = minute
+            tempDate[java.util.Calendar.HOUR_OF_DAY] = hour
+            tempDate[java.util.Calendar.MINUTE] = minute
             onTimeSelected(tempDate)
         },
-        initialDate[Calendar.HOUR_OF_DAY],
-        initialDate[Calendar.MINUTE],
+        initialDate[java.util.Calendar.HOUR_OF_DAY],
+        initialDate[java.util.Calendar.MINUTE],
         false
     )
     timePicker.show()

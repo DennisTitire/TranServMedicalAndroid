@@ -6,19 +6,19 @@ import androidx.room.PrimaryKey
 @Entity
 data class Calendar(
     @PrimaryKey(autoGenerate = false)
-    val calendarId: String = "",
-    val title: String = "",
-    val allDay: Boolean = false,
-    var startEvent: Long?,
-    var endEvent: Long?,
-    val description: String? = ""
+    val calendarId: String,
+    var title: String,
+    val allDay: Boolean,
+    var startEvent: Long,
+    var endEvent: Long,
+    val description: String?
 ) {
     constructor() : this(
         calendarId = "",
         title = "",
         allDay = false,
-        startEvent = null,
-        endEvent = null,
+        startEvent = System.currentTimeMillis(),
+        endEvent = System.currentTimeMillis(),
         description = ""
     )
 }

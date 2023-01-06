@@ -82,7 +82,8 @@ fun CalendarScreen(
                         Log.d("Dash", "day event = $day")
                         events.forEach { event ->
                             CalendarEventItem(
-                                event = event
+                                event = event,
+                                navHostController = navHostController
                             )
                         }
                     }
@@ -96,7 +97,7 @@ fun CalendarScreen(
 @Composable
 fun LazyItemScope.CalendarEventItem(
     event: Calendar,
-    //onClick: (Calendar) -> Unit,
+    navHostController: NavHostController,
 ) {
     Card(
         modifier = Modifier
@@ -118,7 +119,12 @@ fun LazyItemScope.CalendarEventItem(
             Spacer(modifier = Modifier.width(4.dp))
             Column(
                 modifier = Modifier
-                    .clickable { /* TODO: Click on calendar item */ }
+                    .clickable {
+                        navHostController.navigate(
+                            Screen.AddEvent.route +
+                                    "?calendarId=${event.calendarId}"
+                        )
+                    }
                     .padding(12.dp)
                     .fillMaxWidth()
             ) {

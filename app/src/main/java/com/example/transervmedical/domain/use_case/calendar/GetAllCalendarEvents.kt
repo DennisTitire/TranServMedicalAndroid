@@ -12,7 +12,7 @@ class GetAllCalendarEvents @Inject constructor(
         return calendarRepository.getAllCalendarEvents()
             .sortedBy { it.startEvent }
             .groupBy { event ->
-                event.startEvent?.formatDateForMapping() ?: "Nu avem ce face"
+                event.startEvent.formatDateForMapping()
             }
     }
 }

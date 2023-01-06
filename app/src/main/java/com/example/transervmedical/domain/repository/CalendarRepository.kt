@@ -8,4 +8,6 @@ interface CalendarRepository {
 
     suspend fun getAllCalendarEvents(): List<Calendar>
 
+    suspend fun getCalendarEvent(calendarId: String): Calendar
+
 }

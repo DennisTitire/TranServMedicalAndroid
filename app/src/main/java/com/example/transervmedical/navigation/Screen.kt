@@ -7,6 +7,11 @@ sealed class Screen(val route: String) {
     object Dashboard : Screen(route = "HomeScreen")
     object Calendar : Screen(route = "CalendarScreen")
     object AddEvent : Screen(route = "AddEventScreen")
+//    object AddEvent : Screen(route = "AddEventScreen/{calendarId}") {
+//        fun passCalendarId(calendarId: String): String {
+//            return "AddEventScreen/$calendarId"
+//        }
+//    }
     object Settings : Screen(route = "SettingsScreen")
 
 }

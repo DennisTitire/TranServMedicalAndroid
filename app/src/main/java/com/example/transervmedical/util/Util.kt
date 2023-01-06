@@ -10,7 +10,7 @@ object Util {
     const val FIREBASE_DATABASE_URL ="https://transervmedical-default-rtdb.europe-west1.firebasedatabase.app/"
 
     // Navigation
-    const val CALENDAR_EVENT_ARG = "calendar_event"
+    const val CALENDAR_EVENT_ARG = "calendarId"
 
     const val HOUR_IN_MILLIS = 60 * 60 * 1000L
 

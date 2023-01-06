@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.transervmedical.domain.model.Calendar
@@ -11,6 +12,7 @@ import com.example.transervmedical.domain.use_case.calendar.CalendarEvent
 import com.example.transervmedical.domain.use_case.calendar.CalendarUseCases
 import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
 import com.example.transervmedical.presentation.states.CalendarState
+import com.example.transervmedical.util.Util.CALENDAR_EVENT_ARG
 import com.example.transervmedical.util.Util.provideCalendarId
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -19,6 +21,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +32,7 @@ class CalendarViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val database: FirebaseDatabase,
     private val calendarUseCases: CalendarUseCases,
+    private val saveStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     var uiState by mutableStateOf(UiState())
@@ -39,7 +44,16 @@ class CalendarViewModel @Inject constructor(
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
+    private val _selectedCalendarEvent: MutableStateFlow<Calendar?> = MutableStateFlow(null)
+    val selectedCalendarEvent: StateFlow<Calendar?> = _selectedCalendarEvent
+
     init {
+        viewModelScope.launch {
+            val calendarId = saveStateHandle.get<String>(CALENDAR_EVENT_ARG)
+            _selectedCalendarEvent.value = calendarId?.let {
+                calendarUseCases.getCalendarEvent.invoke(calendarId = calendarId)
+            }
+        }
         getDatabaseData()
     }
 
