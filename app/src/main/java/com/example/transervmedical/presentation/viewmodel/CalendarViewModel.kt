@@ -52,6 +52,14 @@ class CalendarViewModel @Inject constructor(
             val calendarId = saveStateHandle.get<String>(CALENDAR_EVENT_ARG)
             _selectedCalendarEvent.value = calendarId?.let {
                 calendarUseCases.getCalendarEvent.invoke(calendarId = calendarId)
+            }.also { calendar ->
+                if (calendar != null) {
+                    calendarState = calendarState.copy(title = calendar.title)
+                    calendarState = calendarState.copy(allDay = calendar.allDay)
+                    calendarState = calendarState.copy(startEvent = calendar.startEvent)
+                    calendarState = calendarState.copy(endEvent = calendar.endEvent)
+                    calendarState = calendarState.copy(description = calendar.description)
+                }
             }
         }
         getDatabaseData()
@@ -162,6 +170,6 @@ class CalendarViewModel @Inject constructor(
     }
 
     data class UiState(
-        val dashboardEvents: Map<String, List<Calendar>> = emptyMap(),
+        val dashboardEvents: Map<String, List<Calendar>> = emptyMap()
     )
 }

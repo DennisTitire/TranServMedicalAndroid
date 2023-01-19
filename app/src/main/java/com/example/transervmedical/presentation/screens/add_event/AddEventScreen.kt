@@ -14,7 +14,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -49,27 +48,8 @@ fun AddEventScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val scaffoldState = rememberScaffoldState()
-    var calendarState = calendarViewModel.calendarState
+    val calendarState = calendarViewModel.calendarState
     val calendarEvent = calendarViewModel.selectedCalendarEvent.collectAsState().value
-
-    var startDate by rememberSaveable {
-        mutableStateOf(
-            calendarState.startEvent ?: (System.currentTimeMillis() + HOUR_IN_MILLIS)
-        )
-    }
-    var endDate by rememberSaveable {
-        mutableStateOf(
-            calendarState.endEvent ?: (System.currentTimeMillis() + 2 * HOUR_IN_MILLIS)
-        )
-    }
-
-    if (calendarEvent != null) {
-        calendarState.title = calendarEvent.title
-        calendarState.allDay = calendarEvent.allDay
-        calendarState.startEvent = calendarEvent.startEvent
-        calendarState.endEvent = calendarEvent.endEvent
-        calendarState.description = calendarEvent.description
-    }
 
     LaunchedEffect(key1 = true) {
         calendarViewModel.validationEvents.collect { event ->
@@ -179,16 +159,30 @@ fun AddEventScreen(
                 AnimatedVisibility(visible = !calendarState.allDay) {
                     EventTimeSection(
                         start = java.util.Calendar.getInstance().apply {
-                            timeInMillis = startDate
+                            timeInMillis = calendarEvent?.startEvent ?: calendarState.startEvent
                         },
                         end = java.util.Calendar.getInstance().apply {
-                            timeInMillis = endDate
+                            timeInMillis = calendarEvent?.endEvent ?: calendarState.endEvent
                         },
                         onStartDateSelected = {
-                            startDate = it.timeInMillis
+                            if (calendarEvent != null) {
+                                calendarEvent.startEvent = it.timeInMillis
+                                calendarViewModel.onCalendarEvent(CalendarEvent.StartEvent(
+                                    startEvent = calendarEvent.startEvent))
+                            } else {
+                                calendarViewModel.onCalendarEvent(CalendarEvent.StartEvent(
+                                    startEvent = it.timeInMillis))
+                            }
                         },
                         onEndDateSelected = {
-                            endDate = it.timeInMillis
+                            if (calendarEvent != null) {
+                                calendarEvent.endEvent = it.timeInMillis
+                                calendarViewModel.onCalendarEvent(CalendarEvent.EndEvent(
+                                    endEvent = calendarEvent.endEvent))
+                            } else {
+                                calendarViewModel.onCalendarEvent(CalendarEvent.EndEvent(
+                                    endEvent = it.timeInMillis))
+                            }
                         },
                     )
                 }
@@ -222,8 +216,7 @@ fun AddEventScreen(
                             calendarViewModel.onCalendarEvent(CalendarEvent.AddCalendarEvent)
                         }
                     },
-                    buttonText = if(calendarEvent != null) "Update Event" else "Add Event"
-
+                    buttonText = if (calendarEvent != null) "Update Event" else "Add Event"
                 )
             }
         }
