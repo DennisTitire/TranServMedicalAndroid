@@ -32,7 +32,7 @@ class CalendarViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val database: FirebaseDatabase,
     private val calendarUseCases: CalendarUseCases,
-    private val saveStateHandle: SavedStateHandle
+    private val saveStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     var uiState by mutableStateOf(UiState())
@@ -86,10 +86,16 @@ class CalendarViewModel @Inject constructor(
                 addCalendarEvent()
                 getAllCalendarEventsFromDb()
             }
+            is CalendarEvent.UpdateCalendarEvent -> {
+                updateCalendarEvent(calendarEvent.calendar)
+            }
+            is CalendarEvent.DeleteCalendarEvent -> {
+                selectedCalendarEvent.value?.let { deleteCalendarEvent(calendar = it) }
+            }
         }
     }
 
-    private fun addCalendarEvent() {
+    private fun addCalendarEvent() = viewModelScope.launch {
         // Working
         val calendarId = provideCalendarId()
         val calendarObject: Calendar
@@ -121,7 +127,7 @@ class CalendarViewModel @Inject constructor(
                 Log.d("Firebase", "Complete Message: ${it.exception}")
             }.addOnFailureListener {
                 viewModelScope.launch {
-                calendarEventError = it.message.toString()
+                    calendarEventError = it.message.toString()
                     validationEventChannel.send(ValidationEvent.Failure)
                 }
                 Log.d("Firebase", "Failure Message: ${it.message}")
@@ -129,7 +135,7 @@ class CalendarViewModel @Inject constructor(
     }
 
 
-    private fun getDatabaseData() {
+    private fun getDatabaseData() = viewModelScope.launch {
         // snapshot data receive
         databaseRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -154,6 +160,36 @@ class CalendarViewModel @Inject constructor(
         })
     }
 
+    private fun updateCalendarEvent(calendar: Calendar) = viewModelScope.launch {
+        databaseRef.child("$userId-${calendar.calendarId}").updateChildren(calendar.toMap())
+            .addOnCompleteListener{
+                viewModelScope.launch {
+                    validationEventChannel.send(ValidationEvent.Success)
+                }
+            }
+            .addOnFailureListener {
+                viewModelScope.launch {
+                    validationEventChannel.send(ValidationEvent.Failure)
+                }
+            }
+    }
+
+    private fun deleteCalendarEvent(calendar: Calendar) {
+        databaseRef.child("$userId-${calendar.calendarId}").removeValue()
+            .addOnCompleteListener {
+                viewModelScope.launch {
+                    validationEventChannel.send(ValidationEvent.Success)
+                }
+            }
+            .addOnFailureListener {
+                viewModelScope.launch {
+                    validationEventChannel.send(ValidationEvent.Failure)
+                }
+            }
+        viewModelScope.launch {
+            calendarUseCases.deleteCalendarEvent.invoke(calendar)
+        }
+    }
 
     fun getAllCalendarEventsFromDb() = viewModelScope.launch {
         val events = calendarUseCases.getAllCalendarEvents.invoke()
@@ -170,6 +206,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     data class UiState(
-        val dashboardEvents: Map<String, List<Calendar>> = emptyMap()
+        val dashboardEvents: Map<String, List<Calendar>> = emptyMap(),
+        val calendar: Calendar? = null,
     )
 }

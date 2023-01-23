@@ -20,4 +20,12 @@ class CalendarRepositoryImpl(
         return calendarDao.getCalendarEvent(calendarId)
     }
 
+    override suspend fun updateCalendarEvent(calendar: Calendar) {
+        return calendarDao.updateCalendarEvent(calendar)
+    }
+
+    override suspend fun deleteCalendarEvent(calendarId: Calendar) {
+        return calendarDao.deleteCalendarEvent(calendarId)
+    }
+
 }

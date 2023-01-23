@@ -31,6 +31,8 @@ class UserViewModel @Inject constructor(
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
+    var rememberMe by mutableStateOf(false)
+
     fun onEventRegister(registerEvent: RegistrationFormEvent) {
         when (registerEvent) {
             is RegistrationFormEvent.EmailChanged -> {

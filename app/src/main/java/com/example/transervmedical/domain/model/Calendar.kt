@@ -2,6 +2,7 @@ package com.example.transervmedical.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.database.Exclude
 
 @Entity
 data class Calendar(
@@ -21,5 +22,17 @@ data class Calendar(
         endEvent = System.currentTimeMillis(),
         description = ""
     )
+
+    @Exclude
+    fun toMap(): Map<String, Any?> {
+        return mapOf(
+            "calendarId" to calendarId,
+            "title" to title,
+            "allDay" to allDay,
+            "startEvent" to startEvent,
+            "endEvent" to endEvent,
+            "description" to description
+        )
+    }
 }
 

@@ -10,4 +10,8 @@ interface CalendarRepository {
 
     suspend fun getCalendarEvent(calendarId: String): Calendar
 
+    suspend fun updateCalendarEvent(calendar: Calendar)
+
+    suspend fun deleteCalendarEvent(calendarId: Calendar)
+
 }

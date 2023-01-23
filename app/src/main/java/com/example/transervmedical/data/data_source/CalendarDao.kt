@@ -1,9 +1,6 @@
 package com.example.transervmedical.data.data_source
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.transervmedical.domain.model.Calendar
 
 @Dao
@@ -17,4 +14,10 @@ interface CalendarDao {
 
     @Query("SELECT * FROM calendar WHERE calendarId=:calendarId")
     suspend fun getCalendarEvent(calendarId: String): Calendar
+
+    @Update
+    suspend fun updateCalendarEvent(calendar: Calendar)
+
+    @Delete
+    suspend fun deleteCalendarEvent(calendarId: Calendar)
 }

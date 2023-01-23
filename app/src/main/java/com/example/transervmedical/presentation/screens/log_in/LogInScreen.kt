@@ -141,7 +141,24 @@ fun LogInScreen(
             },
             buttonText = "Log in",
         )
-        Spacer(modifier = Modifier.height(90.dp))
+        /* Blue Checked RememberMe
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BlueCheckBox(
+                checked = userViewModel.rememberMe ,
+                onCheckedChange = { userViewModel.rememberMe = it }
+            )
+            Text(
+                text = "Remember me",
+                style = MaterialTheme.typography.h1,
+                color = Color.Gray
+            )
+        }
+         */
+        Spacer(modifier = Modifier.height(50.dp))
 
         Row(
             modifier = Modifier

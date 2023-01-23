@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,15 +94,17 @@ fun AddEventScreen(
                         )
                     }
                 },
-//                actions = {
-//                    if (calendarState.calendarId != null) {
-//                        IconButton(onClick = { /*TODO*/ }) {
-//                            Icon(
-//                                imageVector = Icons.Default.Delete,
-//                                contentDescription = "Delete button")
-//                        }
-//                    }
-//                }
+                actions = {
+                    if (calendarEvent?.calendarId != null) {
+                        IconButton(onClick = {
+                            calendarViewModel.onCalendarEvent(CalendarEvent.DeleteCalendarEvent(calendarEvent))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete button")
+                        }
+                    }
+                }
             )
         }
     ) {
@@ -211,7 +214,13 @@ fun AddEventScreen(
                 BlueButton(
                     onClick = {
                         if (calendarEvent != null) {
-                            // updateEvent
+                            calendarViewModel.onCalendarEvent(CalendarEvent.UpdateCalendarEvent(calendarEvent.copy(
+                                title = calendarState.title,
+                                allDay = calendarState.allDay,
+                                startEvent = calendarState.startEvent,
+                                endEvent = calendarState.endEvent,
+                                description = calendarState.description
+                            )))
                         } else {
                             calendarViewModel.onCalendarEvent(CalendarEvent.AddCalendarEvent)
                         }

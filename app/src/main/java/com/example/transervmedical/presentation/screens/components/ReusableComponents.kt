@@ -19,13 +19,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.transervmedical.ui.theme.Blue
 
 object ReusableComponents {
 
     @Composable
     fun BlueButton(
         onClick: () -> Unit,
-        buttonText: String
+        buttonText: String,
     ) {
         Button(
             onClick = { onClick() },
@@ -51,7 +52,7 @@ object ReusableComponents {
         leadingIcon: @Composable (() -> Unit)? = null,
         isError: Boolean = false,
         keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-        keyboardActions: KeyboardActions = KeyboardActions.Default
+        keyboardActions: KeyboardActions = KeyboardActions.Default,
     ) {
         OutlinedTextField(
             value = value,
@@ -75,10 +76,10 @@ object ReusableComponents {
         onValueChange: (String) -> Unit,
         label: String,
         visibility: MutableState<Boolean> = remember { mutableStateOf(false) },
-        maxLines : Int = Int.MAX_VALUE,
+        maxLines: Int = Int.MAX_VALUE,
         isError: Boolean = false,
         keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-        keyboardActions: KeyboardActions = KeyboardActions.Default
+        keyboardActions: KeyboardActions = KeyboardActions.Default,
     ) {
         OutlinedTextField(
             value = value,
@@ -105,6 +106,18 @@ object ReusableComponents {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp)
+        )
+    }
+
+    @Composable
+    fun BlueCheckBox(
+        checked: Boolean,
+        onCheckedChange: ((Boolean) -> Unit)?,
+    ) {
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange ,
+            colors = CheckboxDefaults.colors(checkedColor = Blue)
         )
     }
 }

@@ -8,10 +8,7 @@ import com.example.transervmedical.data.repository.CalendarRepositoryImpl
 import com.example.transervmedical.data.repository.UserRepositoryImpl
 import com.example.transervmedical.domain.repository.CalendarRepository
 import com.example.transervmedical.domain.repository.UserRepository
-import com.example.transervmedical.domain.use_case.calendar.AddCalendarEvent
-import com.example.transervmedical.domain.use_case.calendar.CalendarUseCases
-import com.example.transervmedical.domain.use_case.calendar.GetAllCalendarEvents
-import com.example.transervmedical.domain.use_case.calendar.GetCalendarEvent
+import com.example.transervmedical.domain.use_case.calendar.*
 import com.example.transervmedical.domain.use_case.form.*
 import com.example.transervmedical.domain.use_case.form.register.*
 import com.example.transervmedical.domain.use_case.form.validation.ValidateEmail
@@ -97,7 +94,9 @@ object AppModule {
         return CalendarUseCases(
             addCalendarEvent = AddCalendarEvent(calendarRepository),
             getAllCalendarEvents = GetAllCalendarEvents(calendarRepository),
-            getCalendarEvent = GetCalendarEvent(calendarRepository)
+            getCalendarEvent = GetCalendarEvent(calendarRepository),
+            updateCalendarEvent = UpdateCalendarEvent(calendarRepository),
+            deleteCalendarEvent = DeleteCalendarEvent(calendarRepository)
         )
     }
 
