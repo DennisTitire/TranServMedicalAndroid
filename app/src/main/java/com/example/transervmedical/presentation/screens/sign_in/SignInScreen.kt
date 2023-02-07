@@ -18,12 +18,14 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.transervmedical.R
 import com.example.transervmedical.domain.use_case.form.register.RegistrationFormEvent
 import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
 import com.example.transervmedical.navigation.Screen
@@ -69,7 +71,7 @@ fun SignInScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Sign up", fontSize = 32.sp) },
+            TopAppBar(title = { Text(text = stringResource(id = R.string.SignUp), fontSize = 32.sp) },
                 backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
                 contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 navigationIcon = {
@@ -79,7 +81,7 @@ fun SignInScreen(
                         Icon(
                             modifier = Modifier.size(32.dp),
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back button"
+                            contentDescription = stringResource(id = R.string.BackButton)
                         )
                     }
                 }
@@ -94,7 +96,7 @@ fun SignInScreen(
         ) {
             Text(
                 modifier = Modifier.padding(top = 24.dp, start = 8.dp),
-                text = "Create account", fontSize = 32.sp
+                text = stringResource(R.string.CreateAccount), fontSize = 32.sp
             )
             EditTextEmailOutline(
                 value = registerState.email,
@@ -105,7 +107,7 @@ fun SignInScreen(
                         )
                     )
                 },
-                label = "Email",
+                label = stringResource(id = R.string.Email),
                 isError = registerState.emailErrorType,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
@@ -123,33 +125,33 @@ fun SignInScreen(
                 )
             }
 
-            EditTextEmailOutline(
-                value = registerState.phoneNumber,
-                onValueChange = {
-                    userViewModel.onEventRegister(
-                        RegistrationFormEvent.PhoneNumberChanged(
-                            it
-                        )
-                    )
-                },
-                label = "Phone Number",
-                isError = registerState.phoneNumberErrorType,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                })
-            )
-
-            if (registerState.phoneNumberError != null) {
-                Text(
-                    text = registerState.phoneNumberError,
-                    style = MaterialTheme.typography.h1,
-                    color = MaterialTheme.colors.error
-                )
-            }
+//            EditTextEmailOutline(
+//                value = registerState.phoneNumber,
+//                onValueChange = {
+//                    userViewModel.onEventRegister(
+//                        RegistrationFormEvent.PhoneNumberChanged(
+//                            it
+//                        )
+//                    )
+//                },
+//                label = "Phone Number",
+//                isError = registerState.phoneNumberErrorType,
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Phone,
+//                    imeAction = ImeAction.Next
+//                ),
+//                keyboardActions = KeyboardActions(onNext = {
+//                    focusManager.moveFocus(FocusDirection.Down)
+//                })
+//            )
+//
+//            if (registerState.phoneNumberError != null) {
+//                Text(
+//                    text = registerState.phoneNumberError,
+//                    style = MaterialTheme.typography.h1,
+//                    color = MaterialTheme.colors.error
+//                )
+//            }
             EditTextPasswordOutline(
                 value = registerState.password,
                 onValueChange = {
@@ -159,7 +161,7 @@ fun SignInScreen(
                         )
                     )
                 },
-                label = "Password",
+                label = stringResource(id = R.string.Password),
                 isError = registerState.passwordErrorType,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
@@ -185,7 +187,7 @@ fun SignInScreen(
                         )
                     )
                 },
-                label = "Repeated Password",
+                label = stringResource(R.string.RepeatedPassword),
                 isError = registerState.repeatedPasswordErrorType,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
@@ -204,7 +206,7 @@ fun SignInScreen(
                 onClick = {
                     userViewModel.onEventRegister(RegistrationFormEvent.Submit)
                 },
-                buttonText = "Sign up"
+                buttonText = stringResource(id = R.string.SignUp)
             )
         }
     }

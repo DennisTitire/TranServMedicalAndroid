@@ -39,6 +39,7 @@ class CalendarViewModel @Inject constructor(
         private set
     var calendarState by mutableStateOf(CalendarState())
     private val userId = firebaseAuth.currentUser?.uid
+    private val userEmail = firebaseAuth.currentUser?.email
     private val databaseRef = database.getReference("calendarEvents")
     var calendarEventError by mutableStateOf("No network error")
     private val validationEventChannel = Channel<ValidationEvent>()
@@ -102,6 +103,7 @@ class CalendarViewModel @Inject constructor(
         if (!calendarState.allDay) {
             calendarObject = Calendar(
                 calendarId = calendarId,
+                userName = getUserName(userEmail!!),
                 title = calendarState.title,
                 startEvent = calendarState.startEvent,
                 endEvent = calendarState.endEvent,
@@ -111,6 +113,7 @@ class CalendarViewModel @Inject constructor(
         } else {
             calendarObject = Calendar(
                 calendarId = calendarId,
+                userName = getUserName(userEmail!!),
                 title = calendarState.title,
                 startEvent = System.currentTimeMillis(),
                 endEvent = System.currentTimeMillis(),
@@ -124,13 +127,13 @@ class CalendarViewModel @Inject constructor(
                     validationEventChannel.send(ValidationEvent.Success)
                     calendarUseCases.addCalendarEvent.invoke(calendarObject)
                 }
-                Log.d("Firebase", "Complete Message: ${it.exception}")
+//                Log.d("Firebase", "Complete Message: ${it.exception}")
             }.addOnFailureListener {
                 viewModelScope.launch {
                     calendarEventError = it.message.toString()
                     validationEventChannel.send(ValidationEvent.Failure)
                 }
-                Log.d("Firebase", "Failure Message: ${it.message}")
+//                Log.d("Firebase", "Failure Message: ${it.message}")
             }
     }
 
@@ -141,7 +144,7 @@ class CalendarViewModel @Inject constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (data in snapshot.children) {
                     val calendar = data.getValue(Calendar::class.java)
-                    Log.d("asdf", "calendar : $calendar")
+//                    Log.d("asdf", "calendar : $calendar")
                     if (calendar != null) {
                         viewModelScope.launch {
                             calendarUseCases.addCalendarEvent(calendar)
@@ -155,14 +158,14 @@ class CalendarViewModel @Inject constructor(
                 viewModelScope.launch {
                     validationEventChannel.send(ValidationEvent.Failure)
                 }
-                Log.d("Firebase", "Error: ${error.message}")
+//                Log.d("Firebase", "Error: ${error.message}")
             }
         })
     }
 
     private fun updateCalendarEvent(calendar: Calendar) = viewModelScope.launch {
         databaseRef.child("$userId-${calendar.calendarId}").updateChildren(calendar.toMap())
-            .addOnCompleteListener{
+            .addOnCompleteListener {
                 viewModelScope.launch {
                     validationEventChannel.send(ValidationEvent.Success)
                 }
@@ -198,11 +201,17 @@ class CalendarViewModel @Inject constructor(
         )
     }
 
-    fun getUserEmail(): String? {
-        return if (firebaseAuth.currentUser != null)
-            firebaseAuth.currentUser!!.email
+    private fun getUserName(userEmail: String): String {
+        val fromEmailToUser =
+            mapOf(
+                "dennistitire@gmail.com" to "DennisTitire",
+                "alexa_trandafir2002@yahoo.com" to "TrandafirAlexandra",
+                "trandafir.lucian@yahoo.com" to "TrandafirLucian"
+            )
+        return if (fromEmailToUser.containsKey(userEmail))
+            fromEmailToUser.getValue(userEmail)
         else
-            "No user is logged in"
+            "No user is registered"
     }
 
     data class UiState(

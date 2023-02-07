@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">TranServMedical</string>
+    <string name="CalendarEvent">Calendar Event</string>
+    <string name="BackButton">Back button</string>
+    <string name="DeleteButton">Delete button</string>
+    <string name="Title">Title</string>
+    <string name="AllDay">All Day</string>
+    <string name="Description">Description</string>
+    <string name="UpdateEvent">Update Event</string>
+    <string name="AddEvent">Add Event</string>
+    <string name="Calendar">Calendar</string>
+    <string name="HidePassword">Hide password</string>
+    <string name="ShowPassword">Show password</string>
+    <string name="Dashboard">Dashboard</string>
+    <string name="Settings">Settings</string>
+    <string name="ForgotPassword">Forgot Password</string>
+    <string name="Email">Email</string>
+    <string name="SendEmail">Send email</string>
+    <string name="LogoImage">Logo Image</string>
+    <string name="Welcome">Welcome</string>
+    <string name="Password">Password</string>
+    <string name="LogIn">Log in</string>
+    <string name="DonHaveAnAccount">Don\'t have an account?</string>
+    <string name="SignUp">Sign up</string>
+    <string name="IconResetPassword">Icon reset password</string>
+    <string name="ClickHereToChangeThePassword">Click here to change the password</string>
+    <string name="SignOut">Sign Out</string>
+    <string name="CreateAccount">Create account</string>
+    <string name="RepeatedPassword">Repeated Password</string>
+    <string name="TranservMedicalLogo">TranServMedical Logo</string>
 </resources>

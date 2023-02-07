@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -31,6 +32,7 @@ import com.example.transervmedical.domain.use_case.form.login.LogInFormEvent
 import com.example.transervmedical.domain.use_case.form.validation.ValidationEvent
 import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueButton
+import com.example.transervmedical.presentation.screens.components.ReusableComponents.BlueCheckBox
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextEmailOutline
 import com.example.transervmedical.presentation.screens.components.ReusableComponents.EditTextPasswordOutline
 import com.example.transervmedical.presentation.viewmodel.UserViewModel
@@ -47,17 +49,17 @@ fun LogInScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = context) {
         userViewModel.validationEvents.collect { event ->
             when (event) {
                 is ValidationEvent.Success -> {
                     Toast.makeText(
                         context,
-                        "Successful log in with\n${userViewModel.loginState.email}",
+                        "Login with\n${userViewModel.loginState.email}",
                         Toast.LENGTH_SHORT
                     ).show()
+                    navHostController.popBackStack()
                     navHostController.navigate(route = Screen.Dashboard.route)
-
                 }
                 is ValidationEvent.Failure -> {
                     Toast.makeText(
@@ -85,11 +87,11 @@ fun LogInScreen(
                 .size(300.dp)
                 .align(Alignment.CenterHorizontally),
             painter = painterResource(id = R.drawable.transervmedical_logo),
-            contentDescription = "Logo Image"
+            contentDescription = stringResource(R.string.LogoImage)
         )
         Text(
             modifier = Modifier.padding(start = 8.dp),
-            text = "Welcome",
+            text = stringResource(R.string.Welcome),
             style = MaterialTheme.typography.h6.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 32.sp
@@ -98,7 +100,7 @@ fun LogInScreen(
         EditTextEmailOutline(
             value = loginState.email,
             onValueChange = { userViewModel.onEventLogin(LogInFormEvent.EmailChanged(it)) },
-            label = "Email",
+            label = stringResource(id = R.string.Email),
             isError = loginState.emailErrorType,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
@@ -118,7 +120,7 @@ fun LogInScreen(
         EditTextPasswordOutline(
             value = loginState.password,
             onValueChange = { userViewModel.onEventLogin(LogInFormEvent.PasswordChanged(it)) },
-            label = "Password",
+            label = stringResource(R.string.Password),
             visibility = passwordVisible,
             isError = loginState.passwordErrorType,
             keyboardOptions = KeyboardOptions(
@@ -139,17 +141,33 @@ fun LogInScreen(
             onClick = {
                 userViewModel.onEventLogin(LogInFormEvent.LoginSubmit)
             },
-            buttonText = "Log in",
+            buttonText = stringResource(R.string.LogIn),
         )
-        /* Blue Checked RememberMe
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        navHostController.navigate(route = Screen.ForgotPassword.route)
+                    },
+                text = "Forgot password?",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+        }
+        /* BlueCheckBox RememberMe
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
             BlueCheckBox(
-                checked = userViewModel.rememberMe ,
-                onCheckedChange = { userViewModel.rememberMe = it }
+                checked = loginState.rememberMe ,
+                onCheckedChange = { userViewModel.onEventLogin(LogInFormEvent.RememberMeChanged(it)) }
             )
             Text(
                 text = "Remember me",
@@ -157,8 +175,8 @@ fun LogInScreen(
                 color = Color.Gray
             )
         }
-         */
-        Spacer(modifier = Modifier.height(50.dp))
+        */
+        Spacer(modifier = Modifier.height(25.dp))
 
         Row(
             modifier = Modifier
@@ -185,12 +203,12 @@ fun LogInScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(text = "Don't have an account?", color = Color.Gray)
+            Text(text = stringResource(R.string.DonHaveAnAccount), color = Color.Gray)
             Text(
                 modifier = Modifier.clickable {
                     navHostController.navigate(route = Screen.SignIn.route)
                 },
-                text = "Sign up",
+                text = stringResource(R.string.SignUp),
                 color = Blue,
                 fontSize = 18.sp,
                 style = MaterialTheme.typography.h2

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.compose.rememberNavController
 import com.example.transervmedical.domain.use_case.form.login.LogInFormEvent
 import com.example.transervmedical.domain.use_case.form.register.RegistrationFormEvent
 import com.example.transervmedical.domain.use_case.form.register.RegistrationUseCases
@@ -13,8 +14,12 @@ import com.example.transervmedical.domain.use_case.form.validation.ValidationEve
 import com.example.transervmedical.presentation.states.LoginFormState
 import com.example.transervmedical.presentation.states.RegistrationFormState
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,8 +35,8 @@ class UserViewModel @Inject constructor(
     var firebaseError by mutableStateOf("")
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
-
-    var rememberMe by mutableStateOf(false)
+    private val _toastMessage = MutableSharedFlow<String>()
+    val toastMessage = _toastMessage.asSharedFlow()
 
     fun onEventRegister(registerEvent: RegistrationFormEvent) {
         when (registerEvent) {
@@ -62,8 +67,17 @@ class UserViewModel @Inject constructor(
             is LogInFormEvent.PasswordChanged -> {
                 loginState = loginState.copy(password = loginEvent.password)
             }
+            is LogInFormEvent.RememberMeChanged -> {
+                loginState = loginState.copy(rememberMe = loginEvent.rememberMe)
+            }
+            is LogInFormEvent.ForgotPassword -> {
+                loginState = loginState.copy(email = loginEvent.email)
+            }
             is LogInFormEvent.LoginSubmit -> {
                 checkLoginValidation()
+            }
+            is LogInFormEvent.ForgotPasswordSubmit -> {
+                checkEmailAndChangePassword()
             }
         }
     }
@@ -93,7 +107,7 @@ class UserViewModel @Inject constructor(
                     }
                 } else {
                     viewModelScope.launch {
-                        Log.d("Firebase", "${it.exception?.message}")
+//                        Log.d("Firebase", "${it.exception?.message}")
                         firebaseError = it.exception?.message!!
                         validationEventChannel.send(ValidationEvent.Failure)
                     }
@@ -103,8 +117,8 @@ class UserViewModel @Inject constructor(
 
     private fun checkRegisterValidation() {
         val emailResult = registrationUseCases.validateEmail.execute(registerState.email)
-        val phoneNumberResult =
-            registrationUseCases.validatePhoneNumber.execute(registerState.phoneNumber)
+//        val phoneNumberResult =
+//            registrationUseCases.validatePhoneNumber.execute(registerState.phoneNumber)
         val passwordResult = registrationUseCases.validatePassword.execute(registerState.password)
         val repeatedPasswordResult =
             registrationUseCases.validateRepeatedPassword.execute(
@@ -113,7 +127,7 @@ class UserViewModel @Inject constructor(
             )
         val hasRegisterError = listOf(
             emailResult,
-            phoneNumberResult,
+//            phoneNumberResult,
             passwordResult,
             repeatedPasswordResult
         ).any { !it.success }
@@ -121,8 +135,8 @@ class UserViewModel @Inject constructor(
         registerState = registerState.copy(
             emailError = emailResult.errorMessage,
             emailErrorType = emailResult.errorType,
-            phoneNumberError = phoneNumberResult.errorMessage,
-            phoneNumberErrorType = phoneNumberResult.errorType,
+//            phoneNumberError = phoneNumberResult.errorMessage,
+//            phoneNumberErrorType = phoneNumberResult.errorType,
             passwordError = passwordResult.errorMessage,
             passwordErrorType = repeatedPasswordResult.errorType,
             repeatedPasswordError = repeatedPasswordResult.errorMessage,
@@ -141,9 +155,47 @@ class UserViewModel @Inject constructor(
                     }
                 } else {
                     viewModelScope.launch {
-                        Log.d("Firebase", "${task.exception}")
+//                        Log.d("Firebase", "${task.exception}")
                         firebaseError = task.exception?.message!!
                         validationEventChannel.send(ValidationEvent.Failure)
+                    }
+                }
+            }
+    }
+
+    fun changePasswordWithEmail() {
+        if (firebaseAuth.currentUser != null) {
+            val email = firebaseAuth.currentUser!!.email!!
+            Firebase.auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        viewModelScope.launch {
+                            _toastMessage.emit("Email was sent to your @gmail address")
+                        }
+                    }
+                }
+        } else {
+            viewModelScope.launch {
+                _toastMessage.emit("No user is register")
+            }
+        }
+    }
+
+    private fun checkEmailAndChangePassword() {
+        val emailResult = registrationUseCases.validateEmail.execute(loginState.email)
+        val emailResultError = listOf(emailResult).any { !it.success }
+        loginState = loginState.copy(
+            emailError = emailResult.errorMessage,
+            emailErrorType = emailResult.errorType,
+        )
+        if (emailResultError) return
+
+        Firebase.auth.sendPasswordResetEmail(loginState.email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    viewModelScope.launch {
+                        _toastMessage.emit("Email was sent to your email address")
+                        validationEventChannel.send(ValidationEvent.Success)
                     }
                 }
             }

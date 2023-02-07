@@ -6,10 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.Surface
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.compose.rememberNavController
 import com.example.transervmedical.navigation.Routes
+import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.viewmodel.UserViewModel
 import com.example.transervmedical.ui.theme.TranServMedicalTheme
+import com.example.transervmedical.util.LifecycleEvent
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,26 +25,25 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val navHostController = rememberNavController()
             TranServMedicalTheme {
+                LifecycleEvent { lifeCycleEvent ->
+                    when (lifeCycleEvent) {
+                        Lifecycle.Event.ON_START -> {
+                            if (firebaseAuth.currentUser != null) {
+                                navHostController.popBackStack()
+                                navHostController.navigate(Screen.Dashboard.route)
+                            } else {
+                                navHostController.navigate(Screen.LogIn.route)
+                            }
+                        }
+                        else -> {}
+                    }
+                }
                 Surface {
-                    val navHostController = rememberNavController()
                     Routes(navHostController = navHostController)
                 }
             }
         }
     }
-
-//    override fun onStart() {
-//        setContent {
-//            val currentUser = firebaseAuth.currentUser
-//            if (currentUser != null && userViewModel.rememberMe == true) {
-//                this.startActivity(Actions.openDashboardIntent(this)
-//                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_CLEAR_TOP))
-//            } else {
-//                this.startActivity(Actions.openLogInIntent(this)
-//                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK and Intent.FLAG_ACTIVITY_CLEAR_TOP))
-//            }
-//        }
-//        super.onStart()
-//    }
 }

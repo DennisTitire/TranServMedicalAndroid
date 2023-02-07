@@ -14,15 +14,16 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.transervmedical.R
 import com.example.transervmedical.ui.theme.Blue
 
 object ReusableComponents {
-
     @Composable
     fun BlueButton(
         onClick: () -> Unit,
@@ -93,7 +94,9 @@ object ReusableComponents {
                 val image = if (visibility.value)
                     Icons.Filled.Visibility
                 else Icons.Filled.VisibilityOff
-                val imageDescription = if (visibility.value) "Hide password" else "Show password"
+                val imageDescription =
+                    if (visibility.value) stringResource(R.string.HidePassword) else
+                        stringResource(R.string.ShowPassword)
                 IconButton(
                     onClick = { visibility.value = !visibility.value },
                     modifier = Modifier.padding(end = 12.dp)
@@ -116,7 +119,7 @@ object ReusableComponents {
     ) {
         Checkbox(
             checked = checked,
-            onCheckedChange = onCheckedChange ,
+            onCheckedChange = onCheckedChange,
             colors = CheckboxDefaults.colors(checkedColor = Blue)
         )
     }

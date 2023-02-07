@@ -21,11 +21,14 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.blue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.transervmedical.R
@@ -56,7 +59,8 @@ fun AddEventScreen(
         calendarViewModel.validationEvents.collect { event ->
             when (event) {
                 is ValidationEvent.Success -> {
-                    navHostController.navigate(route = Screen.Dashboard.route)
+                    navHostController.popBackStack()
+                    navHostController.navigate(route = Screen.Calendar.route)
                 }
                 is ValidationEvent.Failure -> {
                     Toast.makeText(
@@ -76,7 +80,7 @@ fun AddEventScreen(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
-                title = { Text(text = "Calendar Event", fontSize = 32.sp) },
+                title = { Text(text = stringResource(R.string.CalendarEvent), fontSize = 32.sp) },
                 backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
                 contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 navigationIcon = {
@@ -90,18 +94,23 @@ fun AddEventScreen(
                         Icon(
                             modifier = Modifier.size(32.dp),
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back button"
+                            contentDescription = stringResource(R.string.BackButton)
                         )
                     }
                 },
                 actions = {
                     if (calendarEvent?.calendarId != null) {
                         IconButton(onClick = {
-                            calendarViewModel.onCalendarEvent(CalendarEvent.DeleteCalendarEvent(calendarEvent))
+                            calendarViewModel.onCalendarEvent(
+                                CalendarEvent.DeleteCalendarEvent(
+                                    calendarEvent
+                                )
+                            )
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete button")
+                                contentDescription = stringResource(R.string.DeleteButton)
+                            )
                         }
                     }
                 }
@@ -118,7 +127,7 @@ fun AddEventScreen(
             EditTextEmailOutline(
                 value = calendarState.title,
                 onValueChange = { calendarViewModel.onCalendarEvent(CalendarEvent.TitleChanged(title = it)) },
-                label = "Title",
+                label = stringResource(R.string.Title),
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -143,7 +152,7 @@ fun AddEventScreen(
                         Icon(painter = painterResource(R.drawable.ic_time), null)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "All Day",
+                            text = stringResource(R.string.AllDay),
                             style = MaterialTheme.typography.body1
                         )
                     }
@@ -170,21 +179,33 @@ fun AddEventScreen(
                         onStartDateSelected = {
                             if (calendarEvent != null) {
                                 calendarEvent.startEvent = it.timeInMillis
-                                calendarViewModel.onCalendarEvent(CalendarEvent.StartEvent(
-                                    startEvent = calendarEvent.startEvent))
+                                calendarViewModel.onCalendarEvent(
+                                    CalendarEvent.StartEvent(
+                                        startEvent = calendarEvent.startEvent
+                                    )
+                                )
                             } else {
-                                calendarViewModel.onCalendarEvent(CalendarEvent.StartEvent(
-                                    startEvent = it.timeInMillis))
+                                calendarViewModel.onCalendarEvent(
+                                    CalendarEvent.StartEvent(
+                                        startEvent = it.timeInMillis
+                                    )
+                                )
                             }
                         },
                         onEndDateSelected = {
                             if (calendarEvent != null) {
                                 calendarEvent.endEvent = it.timeInMillis
-                                calendarViewModel.onCalendarEvent(CalendarEvent.EndEvent(
-                                    endEvent = calendarEvent.endEvent))
+                                calendarViewModel.onCalendarEvent(
+                                    CalendarEvent.EndEvent(
+                                        endEvent = calendarEvent.endEvent
+                                    )
+                                )
                             } else {
-                                calendarViewModel.onCalendarEvent(CalendarEvent.EndEvent(
-                                    endEvent = it.timeInMillis))
+                                calendarViewModel.onCalendarEvent(
+                                    CalendarEvent.EndEvent(
+                                        endEvent = it.timeInMillis
+                                    )
+                                )
                             }
                         },
                     )
@@ -198,11 +219,11 @@ fun AddEventScreen(
                             )
                         )
                     },
-                    label = "Description",
+                    label = stringResource(R.string.Description),
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_description),
-                            contentDescription = "description"
+                            contentDescription = stringResource(id = R.string.Description)
                         )
                     },
                     keyboardOptions = KeyboardOptions(
@@ -214,18 +235,24 @@ fun AddEventScreen(
                 BlueButton(
                     onClick = {
                         if (calendarEvent != null) {
-                            calendarViewModel.onCalendarEvent(CalendarEvent.UpdateCalendarEvent(calendarEvent.copy(
-                                title = calendarState.title,
-                                allDay = calendarState.allDay,
-                                startEvent = calendarState.startEvent,
-                                endEvent = calendarState.endEvent,
-                                description = calendarState.description
-                            )))
+                            calendarViewModel.onCalendarEvent(
+                                CalendarEvent.UpdateCalendarEvent(
+                                    calendarEvent.copy(
+                                        title = calendarState.title,
+                                        allDay = calendarState.allDay,
+                                        startEvent = calendarState.startEvent,
+                                        endEvent = calendarState.endEvent,
+                                        description = calendarState.description
+                                    )
+                                )
+                            )
                         } else {
                             calendarViewModel.onCalendarEvent(CalendarEvent.AddCalendarEvent)
                         }
                     },
-                    buttonText = if (calendarEvent != null) "Update Event" else "Add Event"
+                    buttonText = if (calendarEvent != null)
+                        stringResource(R.string.UpdateEvent) else
+                        stringResource(R.string.AddEvent)
                 )
             }
         }
@@ -399,7 +426,7 @@ fun showTimePicker(
         },
         initialDate[java.util.Calendar.HOUR_OF_DAY],
         initialDate[java.util.Calendar.MINUTE],
-        false
+        true
     )
     timePicker.show()
 }

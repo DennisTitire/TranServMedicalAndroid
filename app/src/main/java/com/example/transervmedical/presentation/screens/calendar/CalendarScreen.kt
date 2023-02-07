@@ -15,21 +15,25 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.transervmedical.R
 import com.example.transervmedical.domain.model.Calendar
 import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.presentation.viewmodel.CalendarViewModel
 import com.example.transervmedical.ui.theme.Blue
 import com.example.transervmedical.util.Util.formatTime
+import kotlinx.coroutines.launch
 import java.util.*
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -44,7 +48,8 @@ fun CalendarScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Calendar", fontSize = 32.sp) },
+            TopAppBar(
+                title = { Text(text = stringResource(R.string.Calendar), fontSize = 32.sp) },
                 backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White,
                 contentColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
                 navigationIcon = {
@@ -54,10 +59,13 @@ fun CalendarScreen(
                         Icon(
                             modifier = Modifier.size(32.dp),
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back button"
+                            contentDescription = stringResource(id = R.string.BackButton)
                         )
                     }
-                }
+                },
+//                actions = {
+//                    state.dashboardEvents.isNotEmpty())
+//                }
             )
         }
     ) {
@@ -79,7 +87,6 @@ fun CalendarScreen(
                             text = day.substring(0, day.indexOf(",")),
                             style = MaterialTheme.typography.h5
                         )
-                        Log.d("Dash", "day event = $day")
                         events.forEach { event ->
                             CalendarEventItem(
                                 event = event,
@@ -136,9 +143,13 @@ fun LazyItemScope.CalendarEventItem(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
+                    text = "by ${event.userName}",
+                    style = MaterialTheme.typography.body2,
+                )
+                Text(
                     text = formatEventStartEnd(
-                        start = event.startEvent ?: 0,
-                        end = event.endEvent ?: 0,
+                        start = event.startEvent,
+                        end = event.endEvent,
                         allDay = event.allDay
                     ),
                     style = MaterialTheme.typography.body1,

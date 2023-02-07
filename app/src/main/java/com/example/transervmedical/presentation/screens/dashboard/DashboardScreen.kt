@@ -13,6 +13,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -21,6 +22,7 @@ import com.example.transervmedical.navigation.Screen
 import com.example.transervmedical.ui.theme.Blue
 import com.example.transervmedical.ui.theme.Orange
 import com.example.transervmedical.ui.theme.Red
+import com.example.transervmedical.util.BackButtonPressHandler
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -33,7 +35,7 @@ fun DashboardScreen(
                 title = {
                     Text(
                         modifier = Modifier.padding(start = 8.dp),
-                        text = "Dashboard",
+                        text = stringResource(R.string.Dashboard),
                         fontSize = 32.sp
                     )
                 },
@@ -51,24 +53,24 @@ fun DashboardScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             HomeItem(
-                title = "Calendar",
-                image = R.drawable.calendar_img,
+                title = stringResource(id = R.string.Calendar),
+                image = R.drawable.icon_calendar_events,
                 backgroundColor = Red
             ) {
                 navHostController.navigate(Screen.Calendar.route)
             }
             Spacer(modifier = Modifier.height(16.dp))
             HomeItem(
-                title = "Add Event",
-                image = R.drawable.calendar_add_event_image,
+                title = stringResource(id = R.string.AddEvent),
+                image = R.drawable.icon_add_calendar_event,
                 backgroundColor = Blue,
             ) {
                 navHostController.navigate(Screen.AddEvent.route)
             }
             Spacer(modifier = Modifier.height(16.dp))
             HomeItem(
-                title = "Settings",
-                image = R.drawable.calendar_add_event_image,
+                title = stringResource(R.string.Settings),
+                image = R.drawable.icon_settings_calendar,
                 backgroundColor = Orange,
             ) {
                 navHostController.navigate(Screen.Settings.route)

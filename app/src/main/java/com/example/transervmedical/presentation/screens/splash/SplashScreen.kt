@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.example.transervmedical.R
 import com.example.transervmedical.navigation.Screen
@@ -25,7 +26,7 @@ fun SplashScreen(
     ) {
         Image(
             painter = painterResource(id = R.drawable.transervmedical_logo),
-            contentDescription = "TranServMedical Logo"
+            contentDescription = stringResource(R.string.TranservMedicalLogo)
         )
     }
     navHostController.popBackStack()

@@ -10,11 +10,13 @@ import androidx.navigation.navArgument
 import com.example.transervmedical.presentation.screens.add_event.AddEventScreen
 import com.example.transervmedical.presentation.screens.calendar.CalendarScreen
 import com.example.transervmedical.presentation.screens.dashboard.DashboardScreen
+import com.example.transervmedical.presentation.screens.forgotPassword.ForgotPasswordScreen
 import com.example.transervmedical.presentation.screens.log_in.LogInScreen
 import com.example.transervmedical.presentation.screens.settings.SettingsScreen
 import com.example.transervmedical.presentation.screens.sign_in.SignInScreen
 import com.example.transervmedical.presentation.screens.splash.SplashScreen
 import com.example.transervmedical.util.Util.CALENDAR_EVENT_ARG
+import com.google.firebase.auth.FirebaseAuth
 
 @ExperimentalFoundationApi
 @Composable
@@ -55,6 +57,9 @@ fun Routes(navHostController: NavHostController) {
         }
         composable(route = Screen.Settings.route) {
             SettingsScreen(navHostController = navHostController)
+        }
+        composable(route = Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(navHostController = navHostController)
         }
     }
 

@@ -106,4 +106,7 @@ dependencies {
     implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
 
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    // Compose Runtime Tracing
+    implementation("androidx.compose.runtime:runtime-tracing:1.0.0-alpha01")
 }

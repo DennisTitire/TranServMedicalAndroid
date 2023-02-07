@@ -20,10 +20,10 @@ object Util {
     }
 
     fun Long.formatTime(): String {
-        val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
-        val sdfNoMinutes = SimpleDateFormat("h a", Locale.getDefault())
+        val sdf = SimpleDateFormat("HH:mm ", Locale.getDefault())
+        val sdfNoMinutes = SimpleDateFormat("H ", Locale.getDefault())
         val minutes = SimpleDateFormat("mm", Locale.getDefault()).format(this)
-        return if (minutes == "00") sdfNoMinutes.format(this) else sdf.format(this)
+        return  sdf.format(this)
     }
 
     fun formatEventStartEnd(start: Long, end: Long, allDay: Boolean): String {

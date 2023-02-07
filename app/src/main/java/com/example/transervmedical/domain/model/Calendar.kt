@@ -8,6 +8,7 @@ import com.google.firebase.database.Exclude
 data class Calendar(
     @PrimaryKey(autoGenerate = false)
     val calendarId: String,
+    val userName: String,
     var title: String,
     val allDay: Boolean,
     var startEvent: Long,
@@ -16,6 +17,7 @@ data class Calendar(
 ) {
     constructor() : this(
         calendarId = "",
+        userName = "",
         title = "",
         allDay = false,
         startEvent = System.currentTimeMillis(),
@@ -27,6 +29,7 @@ data class Calendar(
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "calendarId" to calendarId,
+            "userName" to userName,
             "title" to title,
             "allDay" to allDay,
             "startEvent" to startEvent,
